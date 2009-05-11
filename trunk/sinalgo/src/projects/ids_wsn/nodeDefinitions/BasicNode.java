@@ -14,7 +14,7 @@ public class BasicNode extends Node {
 
 	@Override
 	public void handleMessages(Inbox inbox) {
-		// TODO Auto-generated method stub
+		// Just a test
 		
 	}
 
