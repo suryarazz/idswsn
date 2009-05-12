@@ -1,11 +1,14 @@
 package projects.ids_wsn.nodeDefinitions.routing;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+
+import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
-import projects.ids_wsn.nodes.messages.PayloadMsgDsdv;
+import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
@@ -64,9 +67,12 @@ public class DSDV implements IRouting {
 		if (message instanceof FloodFindDsdv){ 
 			receiveFloodFindMsg(message);
 			
-		}else if (message instanceof PayloadMsgDsdv){ //It's a payload message
-			PayloadMsgDsdv payloadMessage = (PayloadMsgDsdv) message;
+		}else if (message instanceof PayloadMsg){ //It's a payload message
+			PayloadMsg payloadMessage = (PayloadMsg) message;
 			receivePayloadMessage(payloadMessage);
+			
+			node.setColor(Color.YELLOW);
+			Utils.restoreColorNodeTimer(node, 3);
 		}else{ //It's an event
 			//Only route the message if the routing table is not null;
 			//treatEvent(message, this);
@@ -112,7 +118,7 @@ public class DSDV implements IRouting {
 		}
 	}
 	
-	private void receivePayloadMessage(PayloadMsgDsdv payloadMessage) {
+	private void receivePayloadMessage(PayloadMsg payloadMessage) {
 		MultiRoutingEntry re = null;
 		
 		
@@ -130,8 +136,7 @@ public class DSDV implements IRouting {
 				
 				}
 			}
-		}else if (payloadMessage.nextHop.equals(this)){
-			//The node receives the packet. It must spends the energy to receive
+		}else if (payloadMessage.nextHop.equals(node)){
 			
 			//this.setColor(Color.YELLOW);
 			re = multiRoutingTable.get(payloadMessage.baseStation);
@@ -152,6 +157,14 @@ public class DSDV implements IRouting {
 
 	public void sendBroadcast(Message message) {
 		sendMessage(message);		
+	}
+
+	public Node getBestRoute(Node destino) {
+		//TODO: Make this method more generic. In this way, the method only return the route to the base station
+		//Node nodeDst = multiRoutingTable.keys().nextElement();
+		Node nextHopToDst = multiRoutingTable.elements().nextElement().getFirstActiveRoute();
+		
+		return nextHopToDst;
 	}
 
 }

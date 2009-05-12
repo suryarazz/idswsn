@@ -6,6 +6,8 @@ import java.util.Vector;
 
 import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
+import projects.ids_wsn.nodes.messages.PayloadMsg;
+import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
@@ -14,12 +16,13 @@ import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
 
-public abstract class BasicNode extends Node {
+public abstract class BasicNode extends Node{
 	
 	private Color myColor = Color.RED;
 	private List<Integer> blackList = new Vector<Integer>();
 	private Integer firstRoutingTtlRcv = 0;
 	private IRouting routing;
+	private int seqID = 0;
 		
 
 	@Override
@@ -30,10 +33,20 @@ public abstract class BasicNode extends Node {
 
 	@Override
 	public void handleMessages(Inbox inbox) {
+		preHandleMessage(inbox);
+		
 		while (inbox.hasNext()){
+					
 			Message message = inbox.next();
+			
+				preProcessingMessage(message);
+			
 			receiveMessage(message);
+			
+				postProcessingMessage(message);
 		}
+		
+		postHandleMessage(inbox);
 		
 	}
 
@@ -102,4 +115,40 @@ public abstract class BasicNode extends Node {
 	public void setFirstRoutingTtlRcv(Integer firstRoutingTtlRcv) {
 		this.firstRoutingTtlRcv = firstRoutingTtlRcv;
 	}
+	
+	@NodePopupMethod(menuText="Send a message to the Base Station")
+	public void sendMessageToBaseStation(){
+		this.seqID++;
+		Node destino = Tools.getNodeByID(1);
+		Node nextHopToDestino = routing.getBestRoute(destino);
+		
+		PayloadMsg msg = new PayloadMsg(destino, this, nextHopToDestino, this);
+		msg.sequenceNumber = ++this.seqID;
+		SimpleMessageTimer t = new SimpleMessageTimer(msg);
+		t.startRelative(1, this);
+	}
+	
+	
+	/**
+	 * This method is called before the Inbox iterator
+	 */
+	protected void preHandleMessage(Inbox inbox){}	
+	
+	/**
+	 * This method is called before the end of the handleMessage method
+	 */
+	protected void postHandleMessage(Inbox inbox){}
+	
+	/**
+	 * This method is called before the message processing in the handleMessage method
+	 */
+	protected void preProcessingMessage(Message message){}
+	
+	/**
+	 * This method is called after the message processing in the Inbox iterator
+	 */
+	protected void postProcessingMessage(Message message){}
+	
+	public void beforeSendingMessage(Message message){}
+	public void afterSendingMessage(Message message){}
 }
