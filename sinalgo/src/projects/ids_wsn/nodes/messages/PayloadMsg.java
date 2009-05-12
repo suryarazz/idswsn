@@ -8,7 +8,7 @@ import sinalgo.nodes.messages.Message;
 /**
  * A message used to transport data from a sender to a receiver
  */
-public class PayloadMsgDsdv extends Message {
+public class PayloadMsg extends Message {
 	
 	public Node baseStation; // BaseStation: node who should receive this msg
 	public Node nextHop;
@@ -22,7 +22,7 @@ public class PayloadMsgDsdv extends Message {
 	public Integer ttl;
 	
 	
-	public PayloadMsgDsdv(Node destination, Node sender) {
+	public PayloadMsg(Node destination, Node sender) {
 		this.baseStation = destination;
 		this.sender = sender;
 		this.imediateSender = sender;
@@ -34,7 +34,7 @@ public class PayloadMsgDsdv extends Message {
 	
 	@Override
 	public boolean equals(Object obj) {
-		PayloadMsgDsdv msg = (PayloadMsgDsdv) obj;
+		PayloadMsg msg = (PayloadMsg) obj;
 		
 		if (msg.baseStation == null){
 			if ((msg.sender.equals(this.sender)) && (msg.value.equals(this.value))){
@@ -56,7 +56,7 @@ public class PayloadMsgDsdv extends Message {
 	 * @param destination The node to send this msg to
 	 * @param sender The sender who sends this msg
 	 */
-	public PayloadMsgDsdv(Node destination, Node sender, Node nextHop, Node immediateSrc) {
+	public PayloadMsg(Node destination, Node sender, Node nextHop, Node immediateSrc) {
 		this.baseStation = destination;
 		this.sender = sender;
 		this.nextHop = nextHop;
@@ -67,7 +67,7 @@ public class PayloadMsgDsdv extends Message {
 	
 	@Override
 	public Message clone() {
-		PayloadMsgDsdv newMessage = new PayloadMsgDsdv(this.baseStation, this.sender, this.nextHop, this.imediateSender);
+		PayloadMsg newMessage = new PayloadMsg(this.baseStation, this.sender, this.nextHop, this.imediateSender);
 		newMessage.sequenceNumber = this.sequenceNumber;
 		//newMessage.ackTimer = this.ackTimer;
 		newMessage.value = this.value;

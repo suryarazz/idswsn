@@ -1,4 +1,5 @@
 package projects.ids_wsn.nodes.timers;
+import projects.ids_wsn.nodeDefinitions.BasicNode;
 import sinalgo.nodes.messages.Message;
 import sinalgo.nodes.timers.Timer;
 
@@ -20,7 +21,12 @@ public class SimpleMessageTimer extends Timer {
 	@Override
 	public void fire() {
 		//System.out.println("send the message");
+		BasicNode basicNode = (BasicNode)node;
+		basicNode.beforeSendingMessage(msg);
+		
 		node.broadcast(msg);
+		
+		basicNode.afterSendingMessage(msg);
 	}
 
 }
