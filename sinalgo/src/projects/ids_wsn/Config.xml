@@ -23,10 +23,10 @@
 		<asynchronousMode value="false" />
 
 		<!--If set to true, the runtime obtains for each node a new position from the mobility model at the beginning of each round. This flag needs to be turned on if the chosen  mobility model of any node may change the node's position. Set this flag to FALSE for static graphs whose nodes do never change their position to increase performance.-->
-		<mobility value="true" />
+		<mobility value="false" />
 
 		<!--If set to true, the chosen interference model is called at the end of every round to test for interferring packets. To increase performance, set this flag to FALSE if you do not consider interference.-->
-		<interference value="true" />
+		<interference value="false" />
 
 		<!--Set this flag to true if interference only decreases if  less messages are being sent and increases if more messages are being sent. This flag enables considerable optimizations. -->
 		<interferenceIsAdditive value="true" />
@@ -187,6 +187,11 @@
 <GeometricNodeCollection rMax="100"/>
 
 <UDG rMax="100"/>
+
+<NetworkLayer>
+	<!-- Routing protocol used in simulations -->
+	<RoutingProtocol value="projects.ids_wsn.nodeDefinitions.routing.DSDV" />
+</NetworkLayer>
 
 <SINR alpha="2" beta="0.7" noise="0"/>
 
