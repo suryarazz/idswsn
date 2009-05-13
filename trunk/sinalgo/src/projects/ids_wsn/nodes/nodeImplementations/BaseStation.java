@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
+import projects.ids_wsn.nodes.timers.BaseStationMessageTimer;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.gui.transformation.PositionTransformation;
@@ -59,7 +60,7 @@ public class BaseStation extends Node {
 	@NodePopupMethod(menuText="Build routing tree")
 	public void sendMessageTo(){	
 		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this);
-		SimpleMessageTimer t = new SimpleMessageTimer(floodMsg);
+		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg);
 		t.startRelative(1, this);
 		this.isRouteBuild = Boolean.TRUE;
 	}

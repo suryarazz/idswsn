@@ -193,6 +193,13 @@
 	<RoutingProtocol value="projects.ids_wsn.nodeDefinitions.routing.DSDV" />
 </NetworkLayer>
 
+<Monitor>
+	<Inference>
+		<NumberOfPackets value="10" />
+		<InternalBuffer value="2" />
+	</Inference>
+</Monitor>
+
 <SINR alpha="2" beta="0.7" noise="0"/>
 
 <RandomWayPoint>

@@ -1,23 +1,46 @@
 package projects.ids_wsn.nodes.nodeImplementations;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.Monitor.DataMessage;
 import projects.ids_wsn.nodeDefinitions.Monitor.IMonitor;
+import projects.ids_wsn.nodeDefinitions.Monitor.decorator.RepetitionRule;
+import projects.ids_wsn.nodeDefinitions.Monitor.decorator.RetransmissionRule;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
+import sinalgo.configuration.Configuration;
+import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
 
 public class MonitorNode extends BasicNode implements IMonitor {
 	
 	private List<DataMessage> listDataMessages;
+	//private Integer inferenceNumberOfPackets;
+	private Integer internalBuffer;
 
 	public void doInference() {
+				
 	}
 	
 	@Override
-	protected void postProcessingMessage(Message message) {
+	public void init() {
+		setMyColor(Color.RED);
+		super.init();
+		listDataMessages = new ArrayList<DataMessage>();
+		try {
+			internalBuffer = Configuration.getIntegerParameter("Monitor/Inference/InternalBuffer");
+		} catch (CorruptConfigurationEntryException e) {
+			Tools.appendToOutput("Key Monitor/Inference/InternalBuffer not found");
+			e.printStackTrace();
+		}
+		
+	}
+	
+	@Override
+	protected void preProcessingMessage(Message message) {
 		if (message instanceof PayloadMsg){
 			PayloadMsg msg = (PayloadMsg) message;
 			addMessageToList(msg);			
@@ -37,17 +60,28 @@ public class MonitorNode extends BasicNode implements IMonitor {
 		
 		listDataMessages.add(dataMessage);
 		
+		if (listDataMessages.size() == internalBuffer){
+			applyRules();
+		}
+		
 	}
 	
 	@Override
 	public void beforeSendingMessage(Message message) {
-		
-		//We also have to store the messages that the Monitors are forwarding, in order
-		//to correctly correlate the messages
 		if (message instanceof PayloadMsg){
 			PayloadMsg msg = (PayloadMsg) message;
 			addMessageToList(msg);
 		}
+	}
+	
+	private void applyRules(){
+		IMonitor rule1 = new RepetitionRule(this);
+		IMonitor rule2 = new RetransmissionRule(rule1);
+		rule2.doInference();
+	}
+
+	public List<DataMessage> getDataMessage() {
+		return listDataMessages;
 	}
 
 }
