@@ -18,7 +18,7 @@ import sinalgo.tools.Tools;
 
 public abstract class BasicNode extends Node{
 	
-	private Color myColor = Color.RED;
+	private Color myColor = Color.BLUE;
 	private List<Integer> blackList = new Vector<Integer>();
 	private Integer firstRoutingTtlRcv = 0;
 	private IRouting routing;
