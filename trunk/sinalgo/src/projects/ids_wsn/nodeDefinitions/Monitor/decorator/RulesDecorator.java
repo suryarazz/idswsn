@@ -4,6 +4,8 @@ import java.util.List;
 
 import projects.ids_wsn.nodeDefinitions.Monitor.DataMessage;
 import projects.ids_wsn.nodeDefinitions.Monitor.IMonitor;
+import projects.ids_wsn.nodeDefinitions.Monitor.Rules;
+import sinalgo.nodes.Node;
 
 public class RulesDecorator implements IMonitor {
 	
@@ -21,5 +23,11 @@ public class RulesDecorator implements IMonitor {
 	public List<DataMessage> getDataMessage() {
 		return monitor.getDataMessage();
 	}
+
+	public void setMaliciousList(Rules rule, List<Node> lista) {
+		monitor.setMaliciousList(rule, lista);		
+	}
+	
+	
 
 }
