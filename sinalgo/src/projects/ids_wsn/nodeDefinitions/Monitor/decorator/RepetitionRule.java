@@ -5,6 +5,9 @@ import java.util.List;
 
 import projects.ids_wsn.nodeDefinitions.Monitor.DataMessage;
 import projects.ids_wsn.nodeDefinitions.Monitor.IMonitor;
+import projects.ids_wsn.nodeDefinitions.Monitor.Rules;
+import sinalgo.nodes.Node;
+import sinalgo.tools.Tools;
 
 public class RepetitionRule extends RulesDecorator {
 
@@ -20,7 +23,7 @@ public class RepetitionRule extends RulesDecorator {
 	
 	private void applayRepetitionRule(){
 		Integer tamBuffer = getDataMessage().size();
-		List<DataMessage> listTemp = new ArrayList<DataMessage>();
+		List<Node> listTemp = new ArrayList<Node>();
 		DataMessage data1;
 		DataMessage data2;
 		
@@ -34,12 +37,13 @@ public class RepetitionRule extends RulesDecorator {
 			for (int y=x+1; y<tamBuffer;y++){
 				data2 = getDataMessage().get(y);
 				if (data1.equals(data2)){
-					listTemp.add(data1);
+					Node nodeAttacker = Tools.getNodeByID(data1.getImediateSrc());
+					listTemp.add(nodeAttacker);
 					break;
 				}
-			}
-			
+			}	
 		}
+		setMaliciousList(Rules.REPETITION, listTemp);
 	}
 
 }

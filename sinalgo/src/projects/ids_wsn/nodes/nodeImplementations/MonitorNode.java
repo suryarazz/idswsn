@@ -7,11 +7,13 @@ import java.util.List;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.Monitor.DataMessage;
 import projects.ids_wsn.nodeDefinitions.Monitor.IMonitor;
+import projects.ids_wsn.nodeDefinitions.Monitor.Rules;
 import projects.ids_wsn.nodeDefinitions.Monitor.decorator.RepetitionRule;
 import projects.ids_wsn.nodeDefinitions.Monitor.decorator.RetransmissionRule;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
+import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
 
@@ -19,6 +21,9 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	
 	private List<DataMessage> listDataMessages;
 	//private Integer inferenceNumberOfPackets;
+	
+	//list of nodes who have bronken the repetition rule
+	private List<Node> listRepetitionNodes;
 	private Integer internalBuffer;
 
 	public void doInference() {
@@ -82,6 +87,24 @@ public class MonitorNode extends BasicNode implements IMonitor {
 
 	public List<DataMessage> getDataMessage() {
 		return listDataMessages;
+	}
+
+	public void setListRepetitionNodes(List<Node> listRepetitionNodes) {
+		this.listRepetitionNodes = listRepetitionNodes;
+	}
+
+	public List<Node> getListRepetitionNodes() {
+		return listRepetitionNodes;
+	}
+	
+	
+	public void setMaliciousList(Rules rule, List<Node> lista) {
+		switch (rule) {
+		case REPETITION:
+			setListRepetitionNodes(lista);						
+			break;
+		}
+		
 	}
 
 }
