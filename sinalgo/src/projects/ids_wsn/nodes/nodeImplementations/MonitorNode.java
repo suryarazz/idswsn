@@ -22,8 +22,9 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	private List<DataMessage> listDataMessages;
 	//private Integer inferenceNumberOfPackets;
 	
-	//list of nodes who have bronken the repetition rule
-	private List<Node> listRepetitionNodes;
+	//Local inference list of nodes who have bronken the repetition rule
+	private List<Node> listLocalRepetitionNodes;
+	
 	private Integer internalBuffer;
 
 	public void doInference() {
@@ -67,6 +68,7 @@ public class MonitorNode extends BasicNode implements IMonitor {
 		
 		if (listDataMessages.size() == internalBuffer){
 			applyRules();
+			listDataMessages.clear();
 		}
 		
 	}
@@ -89,19 +91,19 @@ public class MonitorNode extends BasicNode implements IMonitor {
 		return listDataMessages;
 	}
 
-	public void setListRepetitionNodes(List<Node> listRepetitionNodes) {
-		this.listRepetitionNodes = listRepetitionNodes;
+	public void setListLocalRepetitionNodes(List<Node> listRepetitionNodes) {
+		this.listLocalRepetitionNodes = listRepetitionNodes;
 	}
 
-	public List<Node> getListRepetitionNodes() {
-		return listRepetitionNodes;
+	public List<Node> getListLocalRepetitionNodes() {
+		return listLocalRepetitionNodes;
 	}
 	
 	
-	public void setMaliciousList(Rules rule, List<Node> lista) {
+	public void setLocalMaliciousList(Rules rule, List<Node> lista) {
 		switch (rule) {
 		case REPETITION:
-			setListRepetitionNodes(lista);						
+			setListLocalRepetitionNodes(lista);						
 			break;
 		}
 		

@@ -12,6 +12,7 @@ import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
+import sinalgo.tools.Tools;
 
 public class DSDV implements IRouting {
 	
@@ -165,6 +166,13 @@ public class DSDV implements IRouting {
 		Node nextHopToDst = multiRoutingTable.elements().nextElement().getFirstActiveRoute();
 		
 		return nextHopToDst;
+	}
+
+	public Boolean isNodeNextHop(Node destination) {
+		MultiRoutingEntry re = multiRoutingTable.get(Tools.getNodeByID(1));
+		Node nextHop = re.getFirstActiveRoute();
+		
+		return (nextHop.equals(destination)) ? Boolean.TRUE : Boolean.FALSE;
 	}
 
 }

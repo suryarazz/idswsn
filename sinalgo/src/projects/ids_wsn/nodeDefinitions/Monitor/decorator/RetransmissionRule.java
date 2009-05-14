@@ -1,7 +1,6 @@
 package projects.ids_wsn.nodeDefinitions.Monitor.decorator;
 
 import projects.ids_wsn.nodeDefinitions.Monitor.IMonitor;
-import sinalgo.tools.Tools;
 
 public class RetransmissionRule extends RulesDecorator {
 

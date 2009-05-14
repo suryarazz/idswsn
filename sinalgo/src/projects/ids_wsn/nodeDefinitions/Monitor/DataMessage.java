@@ -62,12 +62,16 @@ public class DataMessage {
 		
 		//TODO: devemos colocar o Clock para diferenciar as mensagens?
 		if (dataMsg.idMsg.equals(this.idMsg) && dataMsg.imediateSrc.equals(this.imediateSrc) &&
-				dataMsg.imediateDst.equals(this.imediateDst) && dataMsg.source.equals(this.source) &&
-				dataMsg.getClock().equals(this.getClock())){
+				dataMsg.imediateDst.equals(this.imediateDst) && dataMsg.source.equals(this.source)){
 			return true;
 		}else{
 			return false;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "idMsg: "+idMsg+" - imediateSrc: "+imediateSrc+" - imediateDst: "+imediateDst;
 	}
 
 }

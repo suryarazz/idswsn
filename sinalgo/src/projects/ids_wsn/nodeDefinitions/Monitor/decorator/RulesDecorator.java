@@ -24,8 +24,8 @@ public class RulesDecorator implements IMonitor {
 		return monitor.getDataMessage();
 	}
 
-	public void setMaliciousList(Rules rule, List<Node> lista) {
-		monitor.setMaliciousList(rule, lista);		
+	public void setLocalMaliciousList(Rules rule, List<Node> lista) {
+		monitor.setLocalMaliciousList(rule, lista);		
 	}
 	
 	

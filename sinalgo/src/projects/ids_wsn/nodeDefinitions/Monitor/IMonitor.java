@@ -7,5 +7,5 @@ import sinalgo.nodes.Node;
 public interface IMonitor {
 	public void doInference();
 	public List<DataMessage> getDataMessage();
-	public void setMaliciousList(Rules rule, List<Node> lista);
+	public void setLocalMaliciousList(Rules rule, List<Node> lista);
 }
