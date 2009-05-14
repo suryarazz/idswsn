@@ -128,6 +128,10 @@ public abstract class BasicNode extends Node{
 		t.startRelative(1, this);
 	}
 	
+	public Boolean isNodeNextHop(Node destination){
+		return routing.isNodeNextHop(destination);
+	}
+	
 	
 	/**
 	 * This method is called before the Inbox iterator

@@ -196,9 +196,15 @@
 <Monitor>
 	<Inference>
 		<NumberOfPackets value="10" />
-		<InternalBuffer value="2" />
+		<InternalBuffer value="5" />
 	</Inference>
 </Monitor>
+
+<Attack>
+	<Repetition>
+		<Quantity value="1" />
+	</Repetition>
+</Attack>
 
 <SINR alpha="2" beta="0.7" noise="0"/>
 

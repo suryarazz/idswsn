@@ -5,7 +5,6 @@ import java.awt.Graphics;
 
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.timers.BaseStationMessageTimer;
-import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;

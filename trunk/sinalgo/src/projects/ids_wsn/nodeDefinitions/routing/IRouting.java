@@ -10,5 +10,13 @@ public interface IRouting {
 	public void receiveMessage(Message message);
 	public void setNode(BasicNode node);
 	public Node getBestRoute(Node destino);
+	
+	/**
+	 * This method will check wether the destination Node is the Source Node next hop or not.
+	 * 
+	 * @param destination Node
+	 * @return Boolen
+	 */
+	public Boolean isNodeNextHop(Node destination);
 
 }
