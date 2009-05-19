@@ -11,12 +11,6 @@ import sinalgo.nodes.messages.Message;
 public class FloodFindDsdv extends Message {
 
 	/**
-	 * True if this is a find-message, false if it is the answer-message 
-	 * that returns from the destination when the flooding was successful.
-	 */
-	public boolean isFindMessage = true; 
-
-	/**
 	 * The TTL for this message when it's being sent as a find-msg
 	 */
 	public int ttl;
@@ -43,16 +37,15 @@ public class FloodFindDsdv extends Message {
 	public int sequenceID; 
 	
 	/**
-	 * The node to which a route should be established. 
+	 * The lowest node energy collected during the packet routing
 	 */
-	//public Node destination;
+	public double energy;
 	
 	/**
 	 * Default constructor. 
 	 */
 	public FloodFindDsdv(int seqID, Node baseStation, Node forwardingNode) {
 		ttl = 500; // initial TTL
-		isFindMessage = true;
 		hopsToBaseStation = 0;
 		sequenceID = seqID;
 		this.baseStation = baseStation;
@@ -61,20 +54,11 @@ public class FloodFindDsdv extends Message {
 	
 	@Override
 	public Message clone() {
-		// This message requires a read-only policy
-		return this;
-	}
-	
-	
-	/**
-	 * @return A real clone of this message, i.e. a new message object
-	 */
-	public FloodFindDsdv getRealClone() {
 		FloodFindDsdv msg = new FloodFindDsdv(this.sequenceID, this.baseStation, this.forwardingNode);
 		msg.ttl = this.ttl;
-		msg.isFindMessage = this.isFindMessage;
 		msg.hopsToBaseStation = this.hopsToBaseStation;
 		msg.forwardingNode = this.forwardingNode;
+		msg.energy = this.energy;
 		return msg;
 	}
 }

@@ -4,7 +4,7 @@ import projects.ids_wsn.nodeDefinitions.malicious.IAttack;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 
-public class AttackDecorator implements IAttack {
+public class AttackDecorator implements IAttack  {
 	
 	private IAttack attack;
 	
@@ -13,7 +13,7 @@ public class AttackDecorator implements IAttack {
 	}
 
 	public void doAttack(Node node, Message message) {
-		attack.doAttack(node,message);
+		//attack.doAttack(node,message);
 
 	}
 
