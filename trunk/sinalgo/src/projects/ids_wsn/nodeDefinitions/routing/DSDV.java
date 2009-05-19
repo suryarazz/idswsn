@@ -84,7 +84,7 @@ public class DSDV implements IRouting {
 		FloodFindDsdv floodMsg = (FloodFindDsdv) message;
 		Boolean forward = Boolean.TRUE;
 		
-		if (floodMsg.forwardingNode.equals(this)){ // The message bounced back. The node must discard the msg.
+		if (floodMsg.forwardingNode.equals(node)){ // The message bounced back. The node must discard the msg.
 			forward = Boolean.FALSE;
 		}else{
 			MultiRoutingEntry re = multiRoutingTable.get(floodMsg.baseStation);
@@ -111,7 +111,7 @@ public class DSDV implements IRouting {
 		
 		if (forward && floodMsg.ttl > 1){ //Forward the flooding message
 			
-			FloodFindDsdv copy = floodMsg.getRealClone();
+			FloodFindDsdv copy = (FloodFindDsdv) floodMsg.clone();
 			copy.forwardingNode = node;
 			copy.ttl--;
 			copy.hopsToBaseStation++;
@@ -145,9 +145,6 @@ public class DSDV implements IRouting {
 			payloadMessage.imediateSender = node;
 			
 			sendMessage(payloadMessage);
-			
-			//bateria.spent(EnergyMode.SEND);
-			//sendBroadcast(payloadMessage);
 		}
 	}
 
