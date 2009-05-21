@@ -1,7 +1,5 @@
 package projects.ids_wsn.nodes.messages;
 
-import projects.ids_old.monitors.PayloadMonitor;
-import projects.ids_old.monitors.PayloadWarning;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 
@@ -17,8 +15,6 @@ public class PayloadMsg extends Message {
 	public int sequenceNumber; // a number to identify this msg, set by the sender 
 	//public RetryPayloadMessageTimer ackTimer; // The timer set on the sender that will fire if there is no ACK returning from the destination 
 	public Integer value = 0;
-	public PayloadMonitor payloadMonitor;
-	public PayloadWarning payloadWarning;
 	public Integer ttl;
 	
 	
@@ -28,7 +24,6 @@ public class PayloadMsg extends Message {
 		this.imediateSender = sender;
 		this.nextHop = null;
 		this.value = 0;
-		this.payloadMonitor = new PayloadMonitor();
 		this.ttl = 30;
 	}
 	
@@ -61,7 +56,6 @@ public class PayloadMsg extends Message {
 		this.sender = sender;
 		this.nextHop = nextHop;
 		this.imediateSender = immediateSrc;
-		this.payloadMonitor = new PayloadMonitor();
 		this.ttl = 30;
 	}
 	
@@ -71,8 +65,6 @@ public class PayloadMsg extends Message {
 		newMessage.sequenceNumber = this.sequenceNumber;
 		//newMessage.ackTimer = this.ackTimer;
 		newMessage.value = this.value;
-		newMessage.payloadMonitor = this.payloadMonitor;
-		newMessage.payloadWarning = this.payloadWarning;
 		newMessage.ttl = this.ttl;
 		
 		return newMessage;
