@@ -2,6 +2,7 @@ package projects.ids_wsn.nodeDefinitions.routing;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -170,6 +171,11 @@ public class DSDV implements IRouting {
 		Node nextHop = re.getFirstActiveRoute();
 		
 		return (nextHop.equals(destination)) ? Boolean.TRUE : Boolean.FALSE;
+	}
+
+	public Node getSinkNode() {
+		Enumeration<Node> nodes = multiRoutingTable.keys();
+		return nodes.nextElement();
 	}
 
 }

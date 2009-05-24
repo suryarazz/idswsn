@@ -1,15 +1,16 @@
 package projects.ids_wsn.nodeDefinitions.routing.fuzzy;
 
 import projects.ids_wsn.nodeDefinitions.BasicNode;
+import sinalgo.nodes.Node;
 
 public class RoutingField {
 	private Integer sequenceNumber;
 	private Integer numHops;
-	private BasicNode nextHop;
+	private Node nextHop;
 	private Boolean active;
 	private Double fsl;
 	
-	public RoutingField(Integer seq, Integer numHops, BasicNode nextHop, Boolean active, Double fsl){
+	public RoutingField(Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl){
 		this.sequenceNumber = seq;
 		this.numHops = numHops;
 		this.nextHop = nextHop;
@@ -25,7 +26,7 @@ public class RoutingField {
 		this.numHops = numHops;
 	}
 
-	public void setNextHop(BasicNode nextHop) {
+	public void setNextHop(Node nextHop) {
 		this.nextHop = nextHop;
 	}
 
@@ -41,7 +42,7 @@ public class RoutingField {
 		return numHops;
 	}
 
-	public BasicNode getNextHop() {
+	public Node getNextHop() {
 		return nextHop;
 	}
 

@@ -190,7 +190,7 @@
 
 <NetworkLayer>
 	<!-- Routing protocol used in simulations -->
-	<RoutingProtocol value="projects.ids_wsn.nodeDefinitions.routing.DSDV" />
+	<RoutingProtocol value="projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting" />
 </NetworkLayer>
 
 <Monitor>
@@ -205,6 +205,14 @@
 		<Quantity value="1" />
 	</Repetition>
 </Attack>
+
+<LogFiles>
+	<General value="idswsn.log" />
+</LogFiles>
+
+<Energy>
+	<EnergyModel value="projects.ids_wsn.nodeDefinitions.energy.simple.SimpleEnergy" />
+</Energy>
 
 <SINR alpha="2" beta="0.7" noise="0"/>
 

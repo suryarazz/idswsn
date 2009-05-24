@@ -1,31 +1,43 @@
 package projects.ids_wsn.nodeDefinitions.routing.fuzzy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import projects.ids_wsn.comparators.FslComparator;
+import projects.ids_wsn.enumerators.Order;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import sinalgo.nodes.Node;
 
 public class FuzzyRoutingEntry {
 	private List<RoutingField> fields = new ArrayList<RoutingField>();
 	
-	public FuzzyRoutingEntry (Integer seq, Integer numHops, BasicNode nextHop, Boolean active, Double fsl){
+	public FuzzyRoutingEntry (Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl){
 		addField(seq, numHops, nextHop, active, fsl);
 				
 	}
 	
-	public void addField(Integer seq, Integer numHops, BasicNode nextHop, Boolean active, Double fsl){
+	public void addField(Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl){
 		RoutingField r = new RoutingField(seq, numHops, nextHop, active, fsl);
 		fields.add(r);		
 	}
 	
+	/**
+	 * Get the route with the first route with the lowest fsl
+	 * Routes with lower fsl are best
+	 * 
+	 * @return
+	 */
 	public Node getFirstActiveRoute(){
+		
+		
 		Node node = null;
-		for (RoutingField field : fields){
-			if (field.getActive()){
-				node = field.getNextHop();
-			}
-		}
+		Collections.sort(fields, new FslComparator(Order.ASC));
+		
+		RoutingField rf = fields.get(0);
+		
+		node = rf.getNextHop();
+		
 		return node;
 	}
 	
@@ -57,5 +69,45 @@ public class FuzzyRoutingEntry {
 			}
 		}
 		return rf;
+	}
+	
+	/**
+	 * This method search the route with the higher fsl and exchange by a new one
+	 * Routes with high fsl are worst
+	 * 
+	 * @param seq
+	 * @param numHops
+	 * @param nextHop
+	 * @param active
+	 * @param fsl
+	 */
+	public Boolean exchangeRoute(Integer seq, Integer numHops, BasicNode nextHop, Boolean active, Double fsl){
+		
+		Boolean result = Boolean.FALSE;
+		
+		RoutingField r = new RoutingField(seq, numHops, nextHop, active, fsl);
+		
+		//
+		Collections.sort(fields, new FslComparator(Order.DESC));
+		
+		RoutingField rOld = fields.get(0);
+		
+		if (r.getFsl().compareTo(rOld.getFsl()) < 0){
+			fields.remove(0);
+			fields.add(r);
+			result = Boolean.TRUE;
+		}
+		
+		return result;
+		
+	}
+	
+	public Double getLowestFsl(){
+		Collections.sort(fields, new FslComparator(Order.ASC));
+		RoutingField rf = fields.get(0);
+		
+		return rf.getFsl();
+		
+		
 	}
 }
