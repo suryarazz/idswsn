@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import projects.ids_wsn.Utils;
+import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
@@ -23,6 +24,7 @@ public abstract class BasicNode extends Node{
 	private Integer firstRoutingTtlRcv = 0;
 	private IRouting routing;
 	private int seqID = 0;
+	private IEnergy bateria;
 		
 
 	@Override
@@ -61,6 +63,15 @@ public abstract class BasicNode extends Node{
 			routing.setNode(this);
 		} catch (CorruptConfigurationEntryException e) {
 			Tools.appendToOutput("Chave do protocolo de roteamento não foi encontrado");
+			e.printStackTrace();
+		}
+		
+		try {
+			//Here, we have to get the battery implementation from Config.xml and inject into battery attribute
+			String energyModel = Configuration.getStringParameter("Energy/EnergyModel");
+			bateria = Utils.StringToEnergyModel(energyModel);
+		} catch (CorruptConfigurationEntryException e) {
+			Tools.appendToOutput("Energy Model not found");
 			e.printStackTrace();
 		}
 		
@@ -119,10 +130,11 @@ public abstract class BasicNode extends Node{
 	@NodePopupMethod(menuText="Send a message to the Base Station")
 	public void sendMessageToBaseStation(){
 		this.seqID++;
-		Node destino = Tools.getNodeByID(1);
+		Node destino = routing.getSinkNode();
 		Node nextHopToDestino = routing.getBestRoute(destino);
 		
 		PayloadMsg msg = new PayloadMsg(destino, this, nextHopToDestino, this);
+		msg.immediateSource = this;
 		msg.sequenceNumber = ++this.seqID;
 		SimpleMessageTimer t = new SimpleMessageTimer(msg);
 		t.startRelative(1, this);

@@ -58,7 +58,7 @@ public class BaseStation extends Node {
 	
 	@NodePopupMethod(menuText="Build routing tree")
 	public void sendMessageTo(){	
-		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this);
+		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this);
 		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg);
 		t.startRelative(1, this);
 		this.isRouteBuild = Boolean.TRUE;
@@ -67,7 +67,7 @@ public class BaseStation extends Node {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "Base Station";
+		return "Base Station "+this.ID;
 	}
 	
 	@Override

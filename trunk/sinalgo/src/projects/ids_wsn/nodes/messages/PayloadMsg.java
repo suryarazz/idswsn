@@ -17,6 +17,11 @@ public class PayloadMsg extends Message {
 	public Integer value = 0;
 	public Integer ttl;
 	
+	/**
+	 * The immediate Source of the message.
+	 */
+	public Node immediateSource;
+	
 	
 	public PayloadMsg(Node destination, Node sender) {
 		this.baseStation = destination;
@@ -51,11 +56,11 @@ public class PayloadMsg extends Message {
 	 * @param destination The node to send this msg to
 	 * @param sender The sender who sends this msg
 	 */
-	public PayloadMsg(Node destination, Node sender, Node nextHop, Node immediateSrc) {
+	public PayloadMsg(Node destination, Node sender, Node nextHop, Node immediateSender) {
 		this.baseStation = destination;
 		this.sender = sender;
 		this.nextHop = nextHop;
-		this.imediateSender = immediateSrc;
+		this.imediateSender = immediateSender;
 		this.ttl = 30;
 	}
 	
@@ -63,9 +68,9 @@ public class PayloadMsg extends Message {
 	public Message clone() {
 		PayloadMsg newMessage = new PayloadMsg(this.baseStation, this.sender, this.nextHop, this.imediateSender);
 		newMessage.sequenceNumber = this.sequenceNumber;
-		//newMessage.ackTimer = this.ackTimer;
 		newMessage.value = this.value;
 		newMessage.ttl = this.ttl;
+		newMessage.immediateSource = this.immediateSource;
 		
 		return newMessage;
 	}

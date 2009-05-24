@@ -12,6 +12,14 @@ public interface IRouting {
 	public Node getBestRoute(Node destino);
 	
 	/**
+	 * Return the sink node. 
+	 * If the network uses multiple sinks, this method
+	 * must return the Sink of the best route
+	 * 
+	 */
+	public Node getSinkNode();
+	
+	/**
 	 * This method will check wether the destination Node is the Source Node next hop or not.
 	 * 
 	 * @param destination Node
