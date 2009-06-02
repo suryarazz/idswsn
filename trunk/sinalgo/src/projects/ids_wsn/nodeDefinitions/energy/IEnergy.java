@@ -4,4 +4,6 @@ public interface IEnergy {
 	public void spend(EnergyMode mode);
 	
 	public Float getTotalSpentEnergy();
+	
+	public Float getEnergy();
 }

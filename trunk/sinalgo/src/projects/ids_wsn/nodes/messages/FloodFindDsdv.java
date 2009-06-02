@@ -44,7 +44,7 @@ public class FloodFindDsdv extends Message {
 	/**
 	 * The lowest node energy collected during the packet routing
 	 */
-	public double energy;
+	public float energy;
 	
 	/**
 	 * Default constructor. 

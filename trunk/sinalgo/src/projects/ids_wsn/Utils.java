@@ -39,7 +39,7 @@ public class Utils {
 		restoreColorTime.startRelative(time, node);
 	}
 	
-	public static Double calculateFsl(Double energy, Integer numHops){
+	public static Double calculateFsl(Float energy, Integer numHops){
 		Double fsl = 0d;
 		
 		String fileName = "fcl/routing.fcl";

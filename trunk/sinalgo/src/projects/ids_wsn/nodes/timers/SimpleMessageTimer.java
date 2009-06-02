@@ -1,5 +1,6 @@
 package projects.ids_wsn.nodes.timers;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
+import projects.ids_wsn.nodeDefinitions.energy.EnergyMode;
 import sinalgo.nodes.messages.Message;
 import sinalgo.nodes.timers.Timer;
 
@@ -27,6 +28,9 @@ public class SimpleMessageTimer extends Timer {
 		node.broadcast(msg);
 		
 		basicNode.afterSendingMessage(msg);
+		
+		//Spent energy due to the send of the message
+		basicNode.getBateria().spend(EnergyMode.SEND);
 	}
 
 }

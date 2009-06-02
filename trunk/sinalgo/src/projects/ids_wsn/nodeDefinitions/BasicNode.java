@@ -1,10 +1,12 @@
 package projects.ids_wsn.nodeDefinitions;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.util.List;
 import java.util.Vector;
 
 import projects.ids_wsn.Utils;
+import projects.ids_wsn.nodeDefinitions.energy.EnergyMode;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
@@ -12,6 +14,7 @@ import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
+import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
@@ -37,9 +40,15 @@ public abstract class BasicNode extends Node{
 	public void handleMessages(Inbox inbox) {
 		preHandleMessage(inbox);
 		
+		//Spent energy due to the listening mode
+		this.bateria.spend(EnergyMode.LISTEN);
+		
 		while (inbox.hasNext()){
 					
 			Message message = inbox.next();
+			
+			//Message processing
+			this.bateria.spend(EnergyMode.RECEIVE);
 			
 				preProcessingMessage(message);
 			
@@ -140,6 +149,12 @@ public abstract class BasicNode extends Node{
 		t.startRelative(1, this);
 	}
 	
+	@NodePopupMethod(menuText="Print energy")
+	public void printEnergy(){
+		Tools.appendToOutput("Total spent energy: "+getBateria().getTotalSpentEnergy()+"\n");
+		Tools.appendToOutput("Energy left: "+getBateria().getEnergy()+"\n");
+	}
+	
 	public Boolean isNodeNextHop(Node destination){
 		return routing.isNodeNextHop(destination);
 	}
@@ -167,4 +182,19 @@ public abstract class BasicNode extends Node{
 	
 	public void beforeSendingMessage(Message message){}
 	public void afterSendingMessage(Message message){}
+
+	public IEnergy getBateria() {
+		return bateria;
+	}
+
+	public void setBateria(IEnergy bateria) {
+		this.bateria = bateria;
+	}
+	
+	@Override
+	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
+		//super.drawAsDisk(g, pt, highlight, 10);
+		String text = String.valueOf(this.ID);
+		super.drawNodeAsDiskWithText(g, pt, highlight, text, 8, Color.WHITE);
+	}
 }

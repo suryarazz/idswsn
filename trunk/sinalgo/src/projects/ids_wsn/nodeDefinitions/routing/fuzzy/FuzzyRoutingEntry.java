@@ -23,16 +23,15 @@ public class FuzzyRoutingEntry {
 	}
 	
 	/**
-	 * Get the route with the first route with the lowest fsl
+	 * Get the route with the first route with the highest fsl
 	 * Routes with lower fsl are best
 	 * 
 	 * @return
 	 */
-	public Node getFirstActiveRoute(){
-		
+	public Node getFirstActiveRoute(){		
 		
 		Node node = null;
-		Collections.sort(fields, new FslComparator(Order.ASC));
+		Collections.sort(fields, new FslComparator(Order.DESC));
 		
 		RoutingField rf = fields.get(0);
 		
@@ -46,7 +45,7 @@ public class FuzzyRoutingEntry {
 	}
 	
 	public Node getBestRoute(Node node){
-		return null;
+		return getFirstActiveRoute();
 	}
 	
 	public Boolean containsNodeInNextHop(Node node){
@@ -72,8 +71,8 @@ public class FuzzyRoutingEntry {
 	}
 	
 	/**
-	 * This method search the route with the higher fsl and exchange by a new one
-	 * Routes with high fsl are worst
+	 * This method search the route with the lowest fsl and exchange by a new one
+	 * Routes with high fsl are better
 	 * 
 	 * @param seq
 	 * @param numHops
@@ -88,11 +87,11 @@ public class FuzzyRoutingEntry {
 		RoutingField r = new RoutingField(seq, numHops, nextHop, active, fsl);
 		
 		//
-		Collections.sort(fields, new FslComparator(Order.DESC));
+		Collections.sort(fields, new FslComparator(Order.ASC));
 		
 		RoutingField rOld = fields.get(0);
 		
-		if (r.getFsl().compareTo(rOld.getFsl()) < 0){
+		if (r.getFsl().compareTo(rOld.getFsl()) > 0){
 			fields.remove(0);
 			fields.add(r);
 			result = Boolean.TRUE;
@@ -107,7 +106,12 @@ public class FuzzyRoutingEntry {
 		RoutingField rf = fields.get(0);
 		
 		return rf.getFsl();
+	}
+	
+	public Double getHighestFsl(){
+		Collections.sort(fields, new FslComparator(Order.DESC));
+		RoutingField rf = fields.get(0);
 		
-		
+		return rf.getFsl();
 	}
 }
