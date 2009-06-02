@@ -10,6 +10,7 @@ import projects.ids_wsn.nodeDefinitions.routing.IRouting;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
+import projects.sample5.nodes.nodeImplementations.FNode.RoutingEntry;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
@@ -28,7 +29,8 @@ public class FuzzyRouting implements IRouting {
 	private BasicNode node;
 
 	public Node getBestRoute(Node destino) {
-		return null;
+		FuzzyRoutingEntry fRout = fuzzyRoutingTable.get(destino);
+		return fRout.getFirstActiveRoute();
 	}
 
 	public Boolean isNodeNextHop(Node destination) {
@@ -40,14 +42,16 @@ public class FuzzyRouting implements IRouting {
 			receiveFloodFindMessage(message);
 		}else if (message instanceof PayloadMsg){
 			PayloadMsg payloadMessage = (PayloadMsg) message;
-			receivePayloadMessage(payloadMessage);
-			
-			node.setColor(Color.YELLOW);
-			Utils.restoreColorNodeTimer(node, 5);			
+			receivePayloadMessage(payloadMessage);			
 		}else{
 			
 		}
 
+	}
+	
+	private void controlColor(){
+		node.setColor(Color.YELLOW);
+		Utils.restoreColorNodeTimer(node, 5);
 	}
 	
 	private void receivePayloadMessage(PayloadMsg payloadMessage) {
@@ -68,13 +72,13 @@ public class FuzzyRouting implements IRouting {
 					payloadMessage.imediateSender = node;
 				}
 				if (forward){
+					controlColor();
 					sendBroadcast(payloadMessage);
-				
 				}
 			}
 		}else if (payloadMessage.nextHop.equals(node)){
 			
-			//this.setColor(Color.YELLOW);
+			controlColor();
 			fre = fuzzyRoutingTable.get(payloadMessage.baseStation);
 			payloadMessage.nextHop = fre.getFirstActiveRoute();
 			payloadMessage.immediateSource = payloadMessage.imediateSender;
@@ -103,7 +107,7 @@ public class FuzzyRouting implements IRouting {
 		
 		FloodFindDsdv floodMsg = (FloodFindDsdv) message;
 		Boolean forward = Boolean.TRUE;
-		Double energy = 0d;
+		Float energy = 0f;
 		Integer numHops = 0;
 		Double fsl = 0d;
 		
@@ -150,6 +154,12 @@ public class FuzzyRouting implements IRouting {
 		if (forward && floodMsg.ttl > 1){ //Forward the flooding message
 			
 			FloodFindDsdv copy = (FloodFindDsdv) floodMsg.clone();
+			
+			//We have to store the lowest energy found in the path
+			if (node.getBateria().getEnergy().compareTo(copy.energy)<0){
+				copy.energy = node.getBateria().getEnergy();				
+			}
+			
 			copy.immediateSource = copy.forwardingNode;
 			copy.forwardingNode = node;
 			copy.ttl--;
@@ -177,11 +187,11 @@ public class FuzzyRouting implements IRouting {
 			Node node = nodes.nextElement();
 			FuzzyRoutingEntry fre = fuzzyRoutingTable.get(node);
 			if (fsl == null){
-				fsl = fre.getLowestFsl();
+				fsl = fre.getHighestFsl();
 				sinkNode = node;
 			}else{
-				if (fre.getLowestFsl().compareTo(fsl) < 0){
-					fsl = fre.getLowestFsl();
+				if (fre.getHighestFsl().compareTo(fsl) > 0){
+					fsl = fre.getHighestFsl();
 					sinkNode = node;
 				}
 			}

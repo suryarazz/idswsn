@@ -8,9 +8,9 @@ public class RestoreColorTime extends Timer {
 
 	@Override
 	public void fire() {
-		Color color = ((BasicNode) node).getMyColor();
-		((BasicNode) node).setColor(color);
-
+		BasicNode n = (BasicNode) node;
+		Color color = n.getMyColor();
+		n.setColor(color);
 	}
 
 }

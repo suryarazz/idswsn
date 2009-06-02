@@ -4,11 +4,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
+import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.BaseStationMessageTimer;
+import projects.ids_wsn.nodes.timers.RestoreColorBSTime;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
+import sinalgo.nodes.messages.Message;
 
 public class BaseStation extends Node {
 	
@@ -28,7 +31,17 @@ public class BaseStation extends Node {
 
 	@Override
 	public void handleMessages(Inbox inbox) {
-		// TODO Auto-generated method stub
+		while (inbox.hasNext()){
+			Message message = inbox.next();
+			
+			if (message instanceof PayloadMsg){
+				PayloadMsg payloadMessage = (PayloadMsg) message;
+				if ((payloadMessage.nextHop == null) ||
+						(payloadMessage.nextHop.equals(this))){
+						controlColor();					
+				}
+			}
+		}
 		
 	}
 
@@ -59,6 +72,7 @@ public class BaseStation extends Node {
 	@NodePopupMethod(menuText="Build routing tree")
 	public void sendMessageTo(){	
 		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this);
+		floodMsg.energy = 500000;
 		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg);
 		t.startRelative(1, this);
 		this.isRouteBuild = Boolean.TRUE;
@@ -75,6 +89,12 @@ public class BaseStation extends Node {
 		String text = "BS";
 		//super.drawNodeAsDiskWithText(g, pt, highlight, text, 10, Color.WHITE);
 		super.drawNodeAsSquareWithText(g, pt, highlight, text, 11, Color.WHITE);
+	}
+	
+	private void controlColor(){
+		this.setColor(Color.YELLOW);
+		RestoreColorBSTime restoreColorTime = new RestoreColorBSTime();
+		restoreColorTime.startRelative(5, this);
 	}
 	
 

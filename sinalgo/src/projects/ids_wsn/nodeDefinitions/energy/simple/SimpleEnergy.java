@@ -13,6 +13,7 @@ public class SimpleEnergy implements IEnergy {
 	private Float receive;
 	private Float processing;
 	private Float listen;
+	private Float totalEnergy;
 	
 	private Hashtable<Double, Float> energyPerRound = new Hashtable<Double, Float>();
 	
@@ -26,6 +27,7 @@ public class SimpleEnergy implements IEnergy {
 		this.receive = Float.valueOf(0);
 		this.processing = Float.valueOf(0);
 		this.listen = Float.valueOf(0);
+		this.totalEnergy = 60000f;
 	}
 	
 	public Float getTotalSpentEnergy(){
@@ -69,5 +71,9 @@ public class SimpleEnergy implements IEnergy {
 		default:
 			break;
 		}		
+	}
+
+	public Float getEnergy() {
+		return totalEnergy - getTotalSpentEnergy();
 	}
 }
