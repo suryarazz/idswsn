@@ -855,7 +855,7 @@ public class Configuration {
 					+ key + "' is missing.");
 		}
 	}
-	
+
 	/**
 	 * Retrieves an entry of the configuration file corresponding to the given key and converts it to
 	 * a Color object. 
