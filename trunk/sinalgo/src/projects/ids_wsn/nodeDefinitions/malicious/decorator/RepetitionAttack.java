@@ -43,7 +43,7 @@ public class RepetitionAttack extends AttackDecorator implements IAttack {
 			//The malicious node will repeat only the messages which he is the next Hop.
 			if (malNode.isNodeNextHop(payloadMsg.nextHop)){			
 				if (malNode.getCurrentAttacks() >= maxReplayMsg){
-					malNode.sendMessage(message);
+					malNode.getRouting().sendMessage(message);
 				}else{
 					RepetitionTimer repTimer = new RepetitionTimer(payloadMsg,40);
 					repTimer.startRelative(1, node);

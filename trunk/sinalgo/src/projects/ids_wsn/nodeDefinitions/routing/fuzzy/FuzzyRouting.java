@@ -10,7 +10,6 @@ import projects.ids_wsn.nodeDefinitions.routing.IRouting;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
-import projects.sample5.nodes.nodeImplementations.FNode.RoutingEntry;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
@@ -92,7 +91,21 @@ public class FuzzyRouting implements IRouting {
 		sendMessage(message);
 	}
 
-	public void sendMessage(Message message) {
+	public void sendMessage(Integer value) {
+		node.seqID++;
+		Node destino = getSinkNode();
+		Node nextHopToDestino = getBestRoute(destino);
+		
+		PayloadMsg msg = new PayloadMsg(destino, node, nextHopToDestino, node);
+		msg.value = value;
+		msg.immediateSource = node;
+		msg.sequenceNumber = ++this.seqID;
+		
+		SimpleMessageTimer messageTimer = new SimpleMessageTimer(msg);
+		messageTimer.startRelative(1, node);
+	}
+	
+	public void sendMessage(Message message) {		
 		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
 		messageTimer.startRelative(1, node);
 	}
@@ -144,6 +157,7 @@ public class FuzzyRouting implements IRouting {
 					field.setNumHops(floodMsg.hopsToBaseStation);
 					field.setSequenceNumber(floodMsg.sequenceID);
 					field.setNextHop((Node)floodMsg.forwardingNode);
+					field.setFsl(fsl);
 					myLog.logln("Rota;"+Tools.getGlobalTime()+";Rota Alterada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
 				}else{
 					forward = Boolean.FALSE;

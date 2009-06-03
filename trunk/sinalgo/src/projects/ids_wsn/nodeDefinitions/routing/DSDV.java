@@ -178,4 +178,19 @@ public class DSDV implements IRouting {
 		return nodes.nextElement();
 	}
 
+	public void sendMessage(Integer value) {
+		node.seqID++;
+		Node destino = getSinkNode();
+		Node nextHopToDestino = getBestRoute(destino);
+		
+		PayloadMsg msg = new PayloadMsg(destino, node, nextHopToDestino, node);
+		msg.value = value;
+		msg.immediateSource = node;
+		msg.sequenceNumber = ++this.seqID;
+		
+		SimpleMessageTimer messageTimer = new SimpleMessageTimer(msg);
+		messageTimer.startRelative(1, node);
+		
+	}
+
 }
