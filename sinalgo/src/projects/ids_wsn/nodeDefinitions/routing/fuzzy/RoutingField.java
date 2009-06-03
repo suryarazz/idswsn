@@ -1,6 +1,5 @@
 package projects.ids_wsn.nodeDefinitions.routing.fuzzy;
 
-import projects.ids_wsn.nodeDefinitions.BasicNode;
 import sinalgo.nodes.Node;
 
 public class RoutingField {
