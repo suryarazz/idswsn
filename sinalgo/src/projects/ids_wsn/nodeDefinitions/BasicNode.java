@@ -10,7 +10,8 @@ import projects.ids_wsn.nodeDefinitions.energy.EnergyMode;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
-import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
+import projects.ids_wsn.nodes.timers.RepeatSendMessageTimer;
+
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
@@ -26,7 +27,7 @@ public abstract class BasicNode extends Node{
 	private List<Integer> blackList = new Vector<Integer>();
 	private Integer firstRoutingTtlRcv = 0;
 	private IRouting routing;
-	private int seqID = 0;
+	public int seqID = 0;
 	private IEnergy bateria;
 		
 
@@ -52,7 +53,7 @@ public abstract class BasicNode extends Node{
 			
 				preProcessingMessage(message);
 			
-			receiveMessage(message);
+			routing.receiveMessage(message);
 			
 				postProcessingMessage(message);
 		}
@@ -119,14 +120,6 @@ public abstract class BasicNode extends Node{
 	public void setBlackList(Integer item) {
 		blackList.add(item);
 	}
-	
-	public void sendMessage(Message message){
-		routing.sendMessage(message);
-	}
-	
-	public void receiveMessage(Message message){
-		routing.receiveMessage(message);
-	}
 
 	public Integer getFirstRoutingTtlRcv() {
 		return firstRoutingTtlRcv;
@@ -138,16 +131,16 @@ public abstract class BasicNode extends Node{
 	
 	@NodePopupMethod(menuText="Send a message to the Base Station")
 	public void sendMessageToBaseStation(){
-		this.seqID++;
-		Node destino = routing.getSinkNode();
-		Node nextHopToDestino = routing.getBestRoute(destino);
-		
-		PayloadMsg msg = new PayloadMsg(destino, this, nextHopToDestino, this);
-		msg.immediateSource = this;
-		msg.sequenceNumber = ++this.seqID;
-		SimpleMessageTimer t = new SimpleMessageTimer(msg);
+		routing.sendMessage(10);
+	}
+	
+	@NodePopupMethod(menuText="Send continuously a message to the Base Station per Round")
+	public void sendMessageToBaseStationPerRound(){
+		RepeatSendMessageTimer t = new RepeatSendMessageTimer(10);
 		t.startRelative(1, this);
 	}
+	
+	
 	
 	@NodePopupMethod(menuText="Print energy")
 	public void printEnergy(){
@@ -196,5 +189,9 @@ public abstract class BasicNode extends Node{
 		//super.drawAsDisk(g, pt, highlight, 10);
 		String text = String.valueOf(this.ID);
 		super.drawNodeAsDiskWithText(g, pt, highlight, text, 8, Color.WHITE);
+	}
+
+	public IRouting getRouting() {
+		return routing;
 	}
 }

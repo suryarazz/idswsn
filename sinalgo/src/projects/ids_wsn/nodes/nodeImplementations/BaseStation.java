@@ -73,7 +73,16 @@ public class BaseStation extends Node {
 	public void sendMessageTo(){	
 		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this);
 		floodMsg.energy = 500000;
-		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg);
+		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg, 0);
+		t.startRelative(1, this);
+		this.isRouteBuild = Boolean.TRUE;
+	}
+	
+	@NodePopupMethod(menuText="Build routing tree - Fuzzy")
+	public void sendMessageFuzzyTo(){	
+		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this);
+		floodMsg.energy = 500000;
+		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg, 1000);
 		t.startRelative(1, this);
 		this.isRouteBuild = Boolean.TRUE;
 	}
@@ -95,6 +104,10 @@ public class BaseStation extends Node {
 		this.setColor(Color.YELLOW);
 		RestoreColorBSTime restoreColorTime = new RestoreColorBSTime();
 		restoreColorTime.startRelative(5, this);
+	}
+	
+	public Integer getSequenceID(){
+		return ++sequenceID;
 	}
 	
 

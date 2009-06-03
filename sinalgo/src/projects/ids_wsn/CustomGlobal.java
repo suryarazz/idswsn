@@ -39,7 +39,12 @@ package projects.ids_wsn;
 
 import javax.swing.JOptionPane;
 
+import projects.ids_wsn.nodeDefinitions.BasicNode;
+
+import sinalgo.nodes.Node;
 import sinalgo.runtime.AbstractCustomGlobal;
+import sinalgo.tools.Tools;
+import sinalgo.tools.logging.Logging;
 
 /**
  * This class holds customized global state and methods for the framework. 
@@ -80,6 +85,18 @@ public class CustomGlobal extends AbstractCustomGlobal{
 		String answer = JOptionPane.showInputDialog(null, "This is an example.\nType in any text to echo.");
 		// Show an information message 
 		JOptionPane.showMessageDialog(null, "You typed '" + answer + "'", "Example Echo", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	@AbstractCustomGlobal.GlobalMethod(menuText="Generate Nodes Energy Log")
+	public void PrintNodesEnergy() {
+		for (Node n : Tools.getNodeList()){
+			if (n instanceof BasicNode){
+				BasicNode node = (BasicNode)n;
+				Logging log = Logging.getLogger("nodes_energy");
+				log.logln(node.ID+";"+node.getBateria().getEnergy()+";"+node.getBateria().getTotalSpentEnergy());
+			}
+		}
+		JOptionPane.showMessageDialog(null, "Process Completed", "WSN", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	/**
