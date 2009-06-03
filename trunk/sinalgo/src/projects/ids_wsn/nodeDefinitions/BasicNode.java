@@ -9,9 +9,7 @@ import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.energy.EnergyMode;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
-import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.RepeatSendMessageTimer;
-
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
