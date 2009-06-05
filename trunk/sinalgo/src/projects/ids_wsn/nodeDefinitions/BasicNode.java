@@ -9,6 +9,7 @@ import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.energy.EnergyMode;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
+import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.timers.RepeatSendMessageTimer;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
@@ -26,7 +27,19 @@ public abstract class BasicNode extends Node{
 	private Integer firstRoutingTtlRcv = 0;
 	private IRouting routing;
 	public int seqID = 0;
+	public int beaconID = 0;
 	private IEnergy bateria;
+	
+	private Float energy60 = 0f;
+	private Float energy50 = 0f;
+	private Float energy40 = 0f;
+	private Float energy20 = 0f;
+	
+	private Boolean send60 = Boolean.FALSE;
+	private Boolean send50 = Boolean.FALSE;
+	private Boolean send40 = Boolean.FALSE;
+	//private Boolean send20 = Boolean.FALSE;
+	
 		
 
 	@Override
@@ -83,6 +96,10 @@ public abstract class BasicNode extends Node{
 			e.printStackTrace();
 		}
 		
+		energy60 = this.getBateria().getInitialEnergy() * 0.6f;
+		energy50 = this.getBateria().getInitialEnergy() * 0.5f;
+		energy40 = this.getBateria().getInitialEnergy() * 0.4f;
+		energy20 = this.getBateria().getInitialEnergy() * 0.2f;
 	}
 
 	@Override
@@ -99,8 +116,50 @@ public abstract class BasicNode extends Node{
 
 	@Override
 	public void preStep() {
-		// TODO Auto-generated method stub
+		Float energy = this.getBateria().getEnergy();
 		
+		
+		if (energy.intValue() > energy50.intValue() && energy.intValue() < energy60.intValue()){
+			this.setMyColor(Color.MAGENTA);
+			this.setColor(Color.MAGENTA);
+			if (!send60){
+				sendBeaconMessage();
+				send60 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() > energy40.intValue() && energy.intValue() < energy50.intValue()){
+			this.setMyColor(Color.GRAY);
+			this.setColor(Color.GRAY);
+			if (!send50){
+				sendBeaconMessage();
+				send50 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() > energy20.intValue() && energy.intValue() < energy40.intValue()){
+			this.setMyColor(Color.DARK_GRAY);
+			this.setColor(Color.DARK_GRAY);
+			if (!send40){
+				sendBeaconMessage();
+				send40 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() <= 0){
+			this.setMyColor(Color.BLACK);
+			this.setColor(Color.BLACK);
+		}
+	}
+	
+	/**
+	 * This method is used to send a beacon message when the energy level is too low 
+	 */
+	private void sendBeaconMessage(){
+		FloodFindDsdv floodMsg = new FloodFindDsdv(++beaconID, this.routing.getSinkNode(), this, this, this);
+		floodMsg.energy = this.getBateria().getEnergy();
+		floodMsg.ttl = 3;
+		//routing.sendBroadcast(floodMsg);
 	}
 
 	public Color getMyColor() {
@@ -148,6 +207,11 @@ public abstract class BasicNode extends Node{
 	
 	public Boolean isNodeNextHop(Node destination){
 		return routing.isNodeNextHop(destination);
+	}
+	
+	@NodePopupMethod(menuText="Print Routing Table")
+	public void printRoutingTable(){
+		routing.printRoutingTable();		
 	}
 	
 	

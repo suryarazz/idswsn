@@ -193,4 +193,9 @@ public class DSDV implements IRouting {
 		
 	}
 
+	public void printRoutingTable() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

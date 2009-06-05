@@ -76,4 +76,8 @@ public class SimpleEnergy implements IEnergy {
 	public Float getEnergy() {
 		return totalEnergy - getTotalSpentEnergy();
 	}
+	
+	public Float getInitialEnergy(){
+		return this.totalEnergy;
+	}
 }

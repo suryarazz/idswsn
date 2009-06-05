@@ -40,6 +40,24 @@ public class FuzzyRoutingEntry {
 		return node;
 	}
 	
+	/**
+	 * Get the route given and indice
+	 * Routes with lower fsl are best
+	 * 
+	 * @return
+	 */
+	public Node getActiveRoute(Integer ind){		
+		
+		Node node = null;
+		Collections.sort(fields, new FslComparator(Order.DESC));
+		
+		RoutingField rf = fields.get(ind);
+		
+		node = rf.getNextHop();
+		
+		return node;
+	}
+	
 	public Integer getFieldsSize(){
 		return fields.size();
 	}
@@ -113,5 +131,9 @@ public class FuzzyRoutingEntry {
 		RoutingField rf = fields.get(0);
 		
 		return rf.getFsl();
+	}
+	
+	public List<RoutingField> getRoutingFields(){
+		return fields;
 	}
 }

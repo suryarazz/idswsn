@@ -81,6 +81,10 @@ public class FuzzyRouting implements IRouting {
 			fre = fuzzyRoutingTable.get(payloadMessage.baseStation);
 			payloadMessage.nextHop = fre.getFirstActiveRoute();
 			payloadMessage.immediateSource = payloadMessage.imediateSender;
+			
+			if (payloadMessage.nextHop.equals(payloadMessage.immediateSource)){
+				payloadMessage.nextHop = fre.getActiveRoute(1);
+			}
 			payloadMessage.imediateSender = node;
 			
 			sendMessage(payloadMessage);
@@ -152,8 +156,17 @@ public class FuzzyRouting implements IRouting {
 				}
 				forward = Boolean.FALSE;
 			}else {
+				Boolean update = Boolean.FALSE;
 				RoutingField field = re.getRoutingField(floodMsg.forwardingNode);
 				if (field.getSequenceNumber() < floodMsg.sequenceID) { //Update an existing entrie
+					update = Boolean.TRUE;
+				}else{
+					if (!floodMsg.baseStation.equals(floodMsg.source)){ // It's a beacon message (Source and Base Station values are not the same)
+						update = Boolean.TRUE;
+					}
+				}
+				
+				if (update){
 					field.setNumHops(floodMsg.hopsToBaseStation);
 					field.setSequenceNumber(floodMsg.sequenceID);
 					field.setNextHop((Node)floodMsg.forwardingNode);
@@ -212,6 +225,24 @@ public class FuzzyRouting implements IRouting {
 			
 		}
 		return sinkNode;
+	}
+
+	public void printRoutingTable() {
+		Enumeration<Node> nodes = fuzzyRoutingTable.keys();
+		
+		
+		while (nodes.hasMoreElements()){
+			Tools.clearOutput();
+			Node node = nodes.nextElement();
+			FuzzyRoutingEntry fre = fuzzyRoutingTable.get(node);
+			
+			for (RoutingField field : fre.getRoutingFields()){
+				Tools.appendToOutput("BS: "+node.ID+" / NextHop: "+field.getNextHop()+" / FSL: "+field.getFsl()+"\n");
+			}
+			
+			
+		}
+		
 	}
 
 }

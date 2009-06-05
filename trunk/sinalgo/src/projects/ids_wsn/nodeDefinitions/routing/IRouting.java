@@ -11,6 +11,7 @@ public interface IRouting {
 	public void receiveMessage(Message message);
 	public void setNode(BasicNode node);
 	public Node getBestRoute(Node destino);
+	public void printRoutingTable();
 	
 	/**
 	 * Return the sink node. 
