@@ -30,6 +30,11 @@ public class FloodFindDsdv extends Message {
 	 */
 	public Node immediateSource;
 	
+	/**
+	 * The source of the message
+	 */
+	public Node source;
+	
 	
 	/**
 	 * Number of hops to BaseStation 
@@ -49,18 +54,19 @@ public class FloodFindDsdv extends Message {
 	/**
 	 * Default constructor. 
 	 */
-	public FloodFindDsdv(int seqID, Node baseStation, Node immediateSource, Node forwardingNode) {
+	public FloodFindDsdv(int seqID, Node baseStation, Node immediateSource, Node forwardingNode, Node source) {
 		ttl = 500; // initial TTL
 		hopsToBaseStation = 0;
 		sequenceID = seqID;
 		this.baseStation = baseStation;
 		this.forwardingNode = forwardingNode;
 		this.immediateSource = immediateSource;
+		this.source = source;
 	}
 	
 	@Override
 	public Message clone() {
-		FloodFindDsdv msg = new FloodFindDsdv(this.sequenceID, this.baseStation, this.immediateSource, this.forwardingNode);
+		FloodFindDsdv msg = new FloodFindDsdv(this.sequenceID, this.baseStation, this.immediateSource, this.forwardingNode, this.source);
 		msg.ttl = this.ttl;
 		msg.hopsToBaseStation = this.hopsToBaseStation;
 		msg.forwardingNode = this.forwardingNode;

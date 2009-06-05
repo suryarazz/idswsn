@@ -71,7 +71,7 @@ public class BaseStation extends Node {
 	
 	@NodePopupMethod(menuText="Build routing tree")
 	public void sendMessageTo(){	
-		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this);
+		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this, this);
 		floodMsg.energy = 500000;
 		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg, 0);
 		t.startRelative(1, this);
@@ -80,7 +80,7 @@ public class BaseStation extends Node {
 	
 	@NodePopupMethod(menuText="Build routing tree - Fuzzy")
 	public void sendMessageFuzzyTo(){	
-		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this);
+		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this, this);
 		floodMsg.energy = 500000;
 		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg, 1000);
 		t.startRelative(1, this);

@@ -6,4 +6,10 @@ public interface IEnergy {
 	public Float getTotalSpentEnergy();
 	
 	public Float getEnergy();
+	
+	/**
+	 * This method returns the initial energy of the node
+	 * @return InitialEnergy
+	 */
+	public Float getInitialEnergy();
 }
