@@ -73,4 +73,9 @@ public class FloodFindDsdv extends Message {
 		msg.energy = this.energy;
 		return msg;
 	}
+	
+	@Override
+	public String toString() {
+		return "SeqID: "+this.sequenceID+" /BS: "+this.baseStation+" / FwdNode: "+this.forwardingNode+" / iSource: "+this.immediateSource;
+	}
 }
