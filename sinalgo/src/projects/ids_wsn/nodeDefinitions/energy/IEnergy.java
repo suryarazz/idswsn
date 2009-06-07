@@ -8,7 +8,7 @@ public interface IEnergy {
 	public Float getEnergy();
 	
 	/**
-	 * This method returns the initial energy of the node
+	 * This method returns the initial energy of the node.
 	 * @return InitialEnergy
 	 */
 	public Float getInitialEnergy();
