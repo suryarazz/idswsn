@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-
 import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
+import projects.ids_wsn.nodes.messages.EventMessage;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
@@ -75,9 +75,9 @@ public class DSDV implements IRouting {
 			
 			node.setColor(Color.YELLOW);
 			Utils.restoreColorNodeTimer(node, 3);
-		}else{ //It's an event
-			//Only route the message if the routing table is not null;
-			//treatEvent(message, this);
+		}else if (message instanceof EventMessage){ //It's an event
+			EventMessage eventMessage = (EventMessage) message;
+			treatEvent(eventMessage);
 		}
 	}
 	
@@ -196,6 +196,12 @@ public class DSDV implements IRouting {
 	public void printRoutingTable() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void treatEvent(EventMessage message){
+		if (!multiRoutingTable.isEmpty()){						
+			sendMessage(message.value);
+		}
 	}
 
 }

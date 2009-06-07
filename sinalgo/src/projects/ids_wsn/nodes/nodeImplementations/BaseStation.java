@@ -12,12 +12,15 @@ import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.tools.Tools;
 
 public class BaseStation extends Node {
 	
 	private Integer sequenceID = 0;
 
 	private Boolean isRouteBuild = Boolean.FALSE;
+	
+	private Integer countReceivedMessages;
 	
 	public Boolean getIsRouteBuild() {
 		return isRouteBuild;
@@ -38,36 +41,34 @@ public class BaseStation extends Node {
 				PayloadMsg payloadMessage = (PayloadMsg) message;
 				if ((payloadMessage.nextHop == null) ||
 						(payloadMessage.nextHop.equals(this))){
+						countReceivedMessages++;
 						controlColor();					
 				}
 			}
 		}
 		
 	}
+	
+	@NodePopupMethod(menuText="Print the number of received messages")
+	public void printCountReceivedMessages(){
+		//Tools.clearOutput();
+		Tools.appendToOutput(this+": "+this.countReceivedMessages+" messages\n");
+	}
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
+		this.countReceivedMessages = 0;
 		
 	}
 
 	@Override
-	public void neighborhoodChange() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void neighborhoodChange() {}
 
 	@Override
-	public void postStep() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void postStep() {}
 
 	@Override
-	public void preStep() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void preStep() {}
 	
 	@NodePopupMethod(menuText="Build routing tree")
 	public void sendMessageTo(){	
@@ -89,14 +90,12 @@ public class BaseStation extends Node {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return "Base Station "+this.ID;
 	}
 	
 	@Override
 	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
 		String text = "BS";
-		//super.drawNodeAsDiskWithText(g, pt, highlight, text, 10, Color.WHITE);
 		super.drawNodeAsSquareWithText(g, pt, highlight, text, 11, Color.WHITE);
 	}
 	
