@@ -3,10 +3,11 @@ package projects.ids_wsn.nodeDefinitions.routing.fuzzy;
 import java.awt.Color;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
 import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
+import projects.ids_wsn.nodes.messages.BeaconMessage;
+import projects.ids_wsn.nodes.messages.EventMessage;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
@@ -42,12 +43,67 @@ public class FuzzyRouting implements IRouting {
 		}else if (message instanceof PayloadMsg){
 			PayloadMsg payloadMessage = (PayloadMsg) message;
 			receivePayloadMessage(payloadMessage);			
-		}else{
-			
+		}else if (message instanceof BeaconMessage){
+			BeaconMessage beaconMessage = (BeaconMessage) message;
+			receiveBeaconMessage(beaconMessage);
+		}else if (message instanceof EventMessage){
+			EventMessage eventMessage = (EventMessage) message;
+			treatEvent(eventMessage);			
 		}
 
 	}
 	
+	private void receiveBeaconMessage(BeaconMessage beaconMessage) {
+		
+		Logging myLog = Utils.getGeneralLog();
+		Boolean forward = Boolean.TRUE;
+		Float energy = 0f;
+		Integer numHops = 0;
+		Double fsl = 0d;
+		
+		if (beaconMessage.forwardingNode.equals(node)){ // The message bounced back. The node must discard the msg.
+			forward = Boolean.FALSE;
+		}else if(beaconMessage.immediateSource.equals(node)){ // The forwarding node is retransmiting a message that the node have just transmitted.
+			forward = Boolean.FALSE;
+		}else {
+			FuzzyRoutingEntry re = fuzzyRoutingTable.get(beaconMessage.baseStation);
+			
+			RoutingField field = re.getRoutingField(beaconMessage.forwardingNode);
+	
+			if (re.containsNodeInNextHop(beaconMessage.forwardingNode)){
+				energy = beaconMessage.energy;
+				numHops = beaconMessage.hopsToBaseStation;
+				
+				//Calculating the FSL
+				fsl = Utils.calculateFsl(energy, numHops);
+				
+				field.setNumHops(beaconMessage.hopsToBaseStation);
+				field.setSequenceNumber(beaconMessage.sequenceID);
+				field.setNextHop((Node)beaconMessage.forwardingNode);
+				field.setFsl(fsl);
+				myLog.logln("Rota;"+Tools.getGlobalTime()+";Rota Alterada;"+node.ID+";"+beaconMessage.baseStation+";"+beaconMessage.forwardingNode.ID+";"+beaconMessage.sequenceID+";"+beaconMessage.hopsToBaseStation+";"+beaconMessage.energy+";"+fsl);
+			}else{
+				forward = Boolean.FALSE;
+			}
+		}
+		
+		if (forward && beaconMessage.ttl > 1){ //Forward the flooding message
+			
+			BeaconMessage copy = (BeaconMessage) beaconMessage.clone();
+			
+			//We have to store the lowest energy found in the path
+			if (node.getBateria().getEnergy().compareTo(copy.energy)<0){
+				copy.energy = node.getBateria().getEnergy();				
+			}
+			
+			copy.immediateSource = copy.forwardingNode;
+			copy.forwardingNode = node;
+			copy.ttl--;
+			copy.hopsToBaseStation++;
+			sendBroadcast(copy);
+		}				
+	}
+
 	private void controlColor(){
 		node.setColor(Color.YELLOW);
 		Utils.restoreColorNodeTimer(node, 5);
@@ -71,13 +127,11 @@ public class FuzzyRouting implements IRouting {
 					payloadMessage.imediateSender = node;
 				}
 				if (forward){
-					controlColor();
 					sendBroadcast(payloadMessage);
 				}
 			}
 		}else if (payloadMessage.nextHop.equals(node)){
-			
-			controlColor();
+	
 			fre = fuzzyRoutingTable.get(payloadMessage.baseStation);
 			payloadMessage.nextHop = fre.getFirstActiveRoute();
 			payloadMessage.immediateSource = payloadMessage.imediateSender;
@@ -93,6 +147,7 @@ public class FuzzyRouting implements IRouting {
 
 	public void sendBroadcast(Message message) {
 		sendMessage(message);
+		controlColor();
 	}
 
 	public void sendMessage(Integer value) {
@@ -107,11 +162,13 @@ public class FuzzyRouting implements IRouting {
 		
 		SimpleMessageTimer messageTimer = new SimpleMessageTimer(msg);
 		messageTimer.startRelative(1, node);
+		controlColor();
 	}
 	
 	public void sendMessage(Message message) {		
 		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
 		messageTimer.startRelative(1, node);
+		controlColor();
 	}
 
 	public void setNode(BasicNode node) {
@@ -156,17 +213,8 @@ public class FuzzyRouting implements IRouting {
 				}
 				forward = Boolean.FALSE;
 			}else {
-				Boolean update = Boolean.FALSE;
 				RoutingField field = re.getRoutingField(floodMsg.forwardingNode);
 				if (field.getSequenceNumber() < floodMsg.sequenceID) { //Update an existing entrie
-					update = Boolean.TRUE;
-				}else{
-					if (!floodMsg.baseStation.equals(floodMsg.source)){ // It's a beacon message (Source and Base Station values are not the same)
-						update = Boolean.TRUE;
-					}
-				}
-				
-				if (update){
 					field.setNumHops(floodMsg.hopsToBaseStation);
 					field.setSequenceNumber(floodMsg.sequenceID);
 					field.setNextHop((Node)floodMsg.forwardingNode);
@@ -238,11 +286,15 @@ public class FuzzyRouting implements IRouting {
 			
 			for (RoutingField field : fre.getRoutingFields()){
 				Tools.appendToOutput("BS: "+node.ID+" / NextHop: "+field.getNextHop()+" / FSL: "+field.getFsl()+"\n");
-			}
-			
+			}	
+		}
+	}
+	
+	public void treatEvent(EventMessage message){
+		if (!fuzzyRoutingTable.isEmpty()){						
+			sendMessage(message.value);
 			
 		}
-		
 	}
 
 }

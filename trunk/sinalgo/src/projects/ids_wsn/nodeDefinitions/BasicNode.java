@@ -9,7 +9,7 @@ import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.energy.EnergyMode;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
-import projects.ids_wsn.nodes.messages.FloodFindDsdv;
+import projects.ids_wsn.nodes.messages.BeaconMessage;
 import projects.ids_wsn.nodes.timers.RepeatSendMessageTimer;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
@@ -156,10 +156,9 @@ public abstract class BasicNode extends Node{
 	 * This method is used to send a beacon message when the energy level is too low 
 	 */
 	private void sendBeaconMessage(){
-		FloodFindDsdv floodMsg = new FloodFindDsdv(++beaconID, this.routing.getSinkNode(), this, this, this);
-		floodMsg.energy = this.getBateria().getEnergy();
-		floodMsg.ttl = 3;
-		//routing.sendBroadcast(floodMsg);
+		BeaconMessage beacon = new BeaconMessage(++beaconID, this.routing.getSinkNode(), this, this, this);
+		beacon.energy = this.getBateria().getEnergy();
+		routing.sendBroadcast(beacon);
 	}
 
 	public Color getMyColor() {
