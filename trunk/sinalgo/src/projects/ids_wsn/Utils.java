@@ -18,10 +18,18 @@ public class Utils {
 	
 	public static IRouting StringToRoutingProtocol(String name){
 		IRouting routing = null;
-		if (name.contains("DSDV")){
-			routing = new DSDV();
-		}else if (name.contains("Fuzzy")){
-			routing = new FuzzyRouting();
+		
+		try {
+			Class<?> classe = Class.forName(name);
+			try {
+				routing = (IRouting) classe.newInstance();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 		return routing;
 	}

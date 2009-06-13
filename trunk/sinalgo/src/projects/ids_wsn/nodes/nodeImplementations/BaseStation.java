@@ -83,7 +83,7 @@ public class BaseStation extends Node {
 	public void sendMessageFuzzyTo(){	
 		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this, this);
 		floodMsg.energy = 500000;
-		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg, 2000);
+		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg, 1500);
 		t.startRelative(1, this);
 		this.isRouteBuild = Boolean.TRUE;
 	}

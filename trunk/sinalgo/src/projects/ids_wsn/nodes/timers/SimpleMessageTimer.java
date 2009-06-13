@@ -39,5 +39,4 @@ public class SimpleMessageTimer extends Timer {
 		//Spent energy due to the send of the message
 		basicNode.getBateria().spend(EnergyMode.SEND);
 	}
-
 }

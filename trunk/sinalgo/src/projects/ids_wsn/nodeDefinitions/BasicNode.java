@@ -9,7 +9,6 @@ import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.energy.EnergyMode;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
-import projects.ids_wsn.nodes.messages.BeaconMessage;
 import projects.ids_wsn.nodes.timers.RepeatSendMessageTimer;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
@@ -19,7 +18,6 @@ import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
-import sinalgo.tools.logging.Logging;
 
 public abstract class BasicNode extends Node{
 	
