@@ -72,9 +72,6 @@ public class DSDV implements IRouting {
 		}else if (message instanceof PayloadMsg){ //It's a payload message
 			PayloadMsg payloadMessage = (PayloadMsg) message;
 			receivePayloadMessage(payloadMessage);
-			
-			node.setColor(Color.YELLOW);
-			Utils.restoreColorNodeTimer(node, 3);
 		}else if (message instanceof EventMessage){ //It's an event
 			EventMessage eventMessage = (EventMessage) message;
 			treatEvent(eventMessage);
@@ -148,10 +145,20 @@ public class DSDV implements IRouting {
 			sendMessage(payloadMessage);
 		}
 	}
+	
+	private void controlColor(){
+		node.setColor(Color.YELLOW);
+		Utils.restoreColorNodeTimer(node, 3);
+	}
 
 	public void sendMessage(Message message) {
+		
+		if (node.getIsDead()){
+			return;
+		}
 		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
 		messageTimer.startRelative(1, node);
+		controlColor();
 	}
 
 	public void sendBroadcast(Message message) {
@@ -179,6 +186,11 @@ public class DSDV implements IRouting {
 	}
 
 	public void sendMessage(Integer value) {
+		
+		if (node.getIsDead()){
+			return;
+		}
+		
 		node.seqID++;
 		Node destino = getSinkNode();
 		Node nextHopToDestino = getBestRoute(destino);
@@ -190,6 +202,7 @@ public class DSDV implements IRouting {
 		
 		SimpleMessageTimer messageTimer = new SimpleMessageTimer(msg);
 		messageTimer.startRelative(1, node);
+		controlColor();
 		
 	}
 

@@ -19,6 +19,7 @@ import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
+import sinalgo.tools.logging.Logging;
 
 public abstract class BasicNode extends Node{
 	
@@ -30,15 +31,18 @@ public abstract class BasicNode extends Node{
 	public int beaconID = 0;
 	private IEnergy bateria;
 	
-	private Float energy60 = 0f;
-	private Float energy50 = 0f;
-	private Float energy40 = 0f;
-	private Float energy20 = 0f;
+	public Float energy70 = 0f;
+	public Float energy60 = 0f;
+	public Float energy50 = 0f;
+	public Float energy40 = 0f;
 	
-	private Boolean send60 = Boolean.FALSE;
-	private Boolean send50 = Boolean.FALSE;
-	private Boolean send40 = Boolean.FALSE;
+	public Boolean send70 = Boolean.FALSE;
+	public Boolean send60 = Boolean.FALSE;
+	public Boolean send50 = Boolean.FALSE;
 	//private Boolean send20 = Boolean.FALSE;
+	
+	private Boolean isDead = Boolean.FALSE;
+	private Boolean useFuzzyRouting = Boolean.FALSE;
 	
 		
 
@@ -51,6 +55,10 @@ public abstract class BasicNode extends Node{
 	@Override
 	public void handleMessages(Inbox inbox) {
 		preHandleMessage(inbox);
+		
+		if (this.isDead){
+			return;
+		}
 		
 		//Spent energy due to the listening mode
 		this.bateria.spend(EnergyMode.LISTEN);
@@ -96,10 +104,20 @@ public abstract class BasicNode extends Node{
 			e.printStackTrace();
 		}
 		
+		try {
+			String useFuzzy = Configuration.getStringParameter("NetworkLayer/UseFuzzyRouting");
+			if (useFuzzy.equals("yes")){
+				this.useFuzzyRouting = Boolean.TRUE;
+			}
+		} catch (CorruptConfigurationEntryException e) {
+			Tools.appendToOutput("Use Fuzzy Routing Key not found");
+			e.printStackTrace();
+		}
+		
+		energy70 = this.getBateria().getInitialEnergy() * 0.7f;
 		energy60 = this.getBateria().getInitialEnergy() * 0.6f;
 		energy50 = this.getBateria().getInitialEnergy() * 0.5f;
 		energy40 = this.getBateria().getInitialEnergy() * 0.4f;
-		energy20 = this.getBateria().getInitialEnergy() * 0.2f;
 	}
 
 	@Override
@@ -116,49 +134,13 @@ public abstract class BasicNode extends Node{
 
 	@Override
 	public void preStep() {
-		Float energy = this.getBateria().getEnergy();
 		
-		
-		if (energy.intValue() > energy50.intValue() && energy.intValue() < energy60.intValue()){
-			this.setMyColor(Color.MAGENTA);
-			this.setColor(Color.MAGENTA);
-			if (!send60){
-				sendBeaconMessage();
-				send60 = Boolean.TRUE;
-			}
+		//if i am dead, do not do anything
+		if (this.isDead){
+			return;
 		}
 		
-		if (energy.intValue() > energy40.intValue() && energy.intValue() < energy50.intValue()){
-			this.setMyColor(Color.GRAY);
-			this.setColor(Color.GRAY);
-			if (!send50){
-				sendBeaconMessage();
-				send50 = Boolean.TRUE;
-			}
-		}
 		
-		if (energy.intValue() > energy20.intValue() && energy.intValue() < energy40.intValue()){
-			this.setMyColor(Color.DARK_GRAY);
-			this.setColor(Color.DARK_GRAY);
-			if (!send40){
-				sendBeaconMessage();
-				send40 = Boolean.TRUE;
-			}
-		}
-		
-		if (energy.intValue() <= 0){
-			this.setMyColor(Color.BLACK);
-			this.setColor(Color.BLACK);
-		}
-	}
-	
-	/**
-	 * This method is used to send a beacon message when the energy level is too low 
-	 */
-	private void sendBeaconMessage(){
-		BeaconMessage beacon = new BeaconMessage(++beaconID, this.routing.getSinkNode(), this, this, this);
-		beacon.energy = this.getBateria().getEnergy();
-		routing.sendBroadcast(beacon);
 	}
 
 	public Color getMyColor() {
@@ -254,5 +236,17 @@ public abstract class BasicNode extends Node{
 
 	public IRouting getRouting() {
 		return routing;
+	}
+
+	public Boolean getIsDead() {
+		return isDead;
+	}
+
+	public Boolean getUseFuzzyRouting() {
+		return useFuzzyRouting;
+	}
+
+	public void setIsDead(Boolean isDead) {
+		this.isDead = isDead;
 	}
 }

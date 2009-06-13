@@ -37,14 +37,22 @@
 package projects.ids_wsn;
 
 
+import java.awt.Color;
+
 import javax.swing.JOptionPane;
 
+import projects.ids_old.events.BasicEvent;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 
+import sinalgo.io.positionFile.PositionFileIO;
+import sinalgo.nodes.Connections;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.edges.Edge;
 import sinalgo.runtime.AbstractCustomGlobal;
+import sinalgo.runtime.AbstractCustomGlobal.GlobalMethod;
 import sinalgo.tools.Tools;
 import sinalgo.tools.logging.Logging;
+import sinalgo.tools.storage.ReusableListIterator;
 
 /**
  * This class holds customized global state and methods for the framework. 
@@ -107,5 +115,41 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	@AbstractCustomGlobal.CustomButton(buttonText="GO", toolTipText="A sample button")
 	public void sampleButton() {
 		JOptionPane.showMessageDialog(null, "You Pressed the 'GO' button.");
+	}
+	
+	@AbstractCustomGlobal.GlobalMethod(menuText="Localizar Nó")
+	public void localizarNo() {
+		// Query the user for an input
+		String resp = JOptionPane.showInputDialog(null, "Digite o ID nó");
+	    Integer idNo = Integer.valueOf(resp);
+		// Show an information message 
+		Node no = Tools.getNodeByID(idNo);
+		if (no == null){
+			JOptionPane.showInputDialog(null, "Nó não existe");
+		}else{
+			no.setColor(Color.RED);
+		}
+	}
+	
+	@GlobalMethod(menuText="Generate Position File")
+	public void generateFilePosition() {
+		PositionFileIO.printPos(null);
+		JOptionPane.showMessageDialog(null, "Position File Generated");
+	}
+	
+	@GlobalMethod(menuText="Remove Events Edges")
+	public void removeBasicEventEdges() {
+		for(Node n : Tools.getNodeList()) {
+			
+			if (n instanceof BasicEvent){
+				Connections conn = n.outgoingConnections;
+				ReusableListIterator<Edge> edgeList = conn.iterator();
+				edgeList.reset();
+				while (edgeList.hasNext()){
+					Edge e = edgeList.next();
+					e.defaultColor = Color.WHITE;
+				}
+			}
+		}
 	}
 }

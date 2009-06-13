@@ -66,12 +66,39 @@ public class Utils {
 	
 	public static Logging getGeneralLog(){
 		String logFile = "";
+		String simulationName = getSimulationName();
 		try {
 			logFile = Configuration.getStringParameter("LogFiles/General");
+			logFile = logFile+"_"+simulationName+".log";
 		} catch (CorruptConfigurationEntryException e) {
 			Tools.appendToOutput("General log file not found");
 			e.printStackTrace();
 		}
 		return Logging.getLogger(logFile);
+	}
+	
+	public static Logging getDeadNodesLog(){
+		String logFile = "";
+		String simulationName = getSimulationName();
+		try {
+			logFile = Configuration.getStringParameter("LogFiles/DeadNodes");
+			logFile = logFile+"_"+simulationName+".log";
+		} catch (CorruptConfigurationEntryException e) {
+			Tools.appendToOutput("Dead Nodes log file not found");
+			e.printStackTrace();
+		}
+		return Logging.getLogger(logFile);
+	}
+	
+	public static String getSimulationName(){
+		String name = "";
+		try {
+			name = Configuration.getStringParameter("SimulationName");
+		} catch (CorruptConfigurationEntryException e) {
+			Tools.appendToOutput("Simulation Name entry not found");
+			e.printStackTrace();
+		}
+		return name;
+		
 	}
 }

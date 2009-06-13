@@ -17,6 +17,12 @@ public class RepetitionTimer extends Timer {
 	@Override
 	public void fire() {
 		BasicNode n = (BasicNode) node;
+		
+		//If the node is dead, don't do anything
+		if (n.getIsDead()){
+			return;
+		}
+		
 		n.getRouting().sendMessage(msg);
 		this.startRelative(interval, n);
 
