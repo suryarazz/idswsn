@@ -8,10 +8,10 @@
 		<dimensions value="2" />
 
 		<!--Length of the deployment field along the x-axis.-->
-		<dimX value="700" />
+		<dimX value="1200" />
 
 		<!--Length of the deployment field along the y-axis.-->
-		<dimY value="700" />
+		<dimY value="1200" />
 
 		<!--Length of the deployment field along the z-axis.-->
 		<dimZ value="500" />
@@ -190,8 +190,11 @@
 
 <NetworkLayer>
 	<!-- Routing protocol used in simulations -->
-	<RoutingProtocol value="projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting" />
+	<RoutingProtocol value="projects.ids_wsn.nodeDefinitions.routing.DSDV" />
+	<UseFuzzyRouting value="yes" />
 </NetworkLayer>
+
+<SimulationName value="redeNormal"/>
 
 <Monitor>
 	<Inference>
@@ -207,7 +210,8 @@
 </Attack>
 
 <LogFiles>
-	<General value="idswsn.log" />
+	<General value="idswsn" />
+	<DeadNodes value="deadnodes" />
 </LogFiles>
 
 <Energy>

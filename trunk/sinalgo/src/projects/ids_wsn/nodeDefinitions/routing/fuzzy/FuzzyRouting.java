@@ -100,7 +100,7 @@ public class FuzzyRouting implements IRouting {
 			copy.forwardingNode = node;
 			copy.ttl--;
 			copy.hopsToBaseStation++;
-			sendBroadcast(copy);
+			sendMessage(copy);
 		}				
 	}
 
@@ -131,6 +131,7 @@ public class FuzzyRouting implements IRouting {
 				}
 			}
 		}else if (payloadMessage.nextHop.equals(node)){
+			Node immediateSenderOriginal = payloadMessage.imediateSender;
 	
 			fre = fuzzyRoutingTable.get(payloadMessage.baseStation);
 			payloadMessage.nextHop = fre.getFirstActiveRoute();
@@ -141,8 +142,64 @@ public class FuzzyRouting implements IRouting {
 			}
 			payloadMessage.imediateSender = node;
 			
+			checkEnergyLevel(immediateSenderOriginal);
 			sendMessage(payloadMessage);
+			
 		}
+	}
+	
+	private void checkEnergyLevel(Node sender) {
+		Logging deadLog = Utils.getDeadNodesLog();
+		Float energy = node.getBateria().getEnergy();
+		Boolean sendBeacon = Boolean.FALSE;
+		
+		if (energy.intValue() > node.energy60.intValue() && energy.intValue() < node.energy70.intValue()){
+			node.setMyColor(Color.MAGENTA);
+			node.setColor(Color.MAGENTA);
+			if (!node.send70){
+				//sendBeacon = Boolean.TRUE;
+				node.send70 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() > node.energy50.intValue() && energy.intValue() < node.energy60.intValue()){
+			node.setMyColor(Color.GRAY);
+			node.setColor(Color.GRAY);
+			if (!node.send60){
+				sendBeacon = Boolean.TRUE;
+				node.send60 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() > node.energy40.intValue() && energy.intValue() < node.energy50.intValue()){
+			node.setMyColor(Color.DARK_GRAY);
+			node.setColor(Color.DARK_GRAY);
+			if (!node.send50){
+				sendBeacon = Boolean.TRUE;
+				node.send50 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() <= 0){
+			node.setMyColor(Color.BLACK);
+			node.setColor(Color.BLACK);
+			node.setIsDead(Boolean.TRUE);
+			deadLog.logln(Tools.getGlobalTime()+":"+node.ID);
+		}
+		
+		if (node.getUseFuzzyRouting() && sendBeacon){
+			sendBeaconMessage(sender);
+		}
+	}
+	
+	/**
+	 * This method is used to send a beacon message when the energy level is too low 
+	 */
+	private void sendBeaconMessage(Node nextHop){
+		BeaconMessage beacon = new BeaconMessage(++node.beaconID, node.getRouting().getSinkNode(), node, node, node);
+		//beacon.nextHop = nextHop;
+		beacon.energy = node.getBateria().getEnergy();
+		this.sendBroadcast(beacon);
 	}
 
 	public void sendBroadcast(Message message) {
@@ -151,6 +208,11 @@ public class FuzzyRouting implements IRouting {
 	}
 
 	public void sendMessage(Integer value) {
+		
+		if (node.getIsDead()){
+			return;
+		}
+		
 		node.seqID++;
 		Node destino = getSinkNode();
 		Node nextHopToDestino = getBestRoute(destino);
@@ -166,6 +228,11 @@ public class FuzzyRouting implements IRouting {
 	}
 	
 	public void sendMessage(Message message) {		
+		
+		if (node.getIsDead()){
+			return;
+		}
+		
 		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
 		messageTimer.startRelative(1, node);
 		controlColor();

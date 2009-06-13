@@ -50,7 +50,7 @@ public class BeaconMessage extends Message {
 	 * Default constructor. 
 	 */
 	public BeaconMessage(int seqID, Node baseStation, Node immediateSource, Node forwardingNode, Node source) {
-		ttl = 5; // initial TTL
+		ttl = 3; // initial TTL
 		hopsToBaseStation = 0;
 		sequenceID = seqID;
 		this.baseStation = baseStation;

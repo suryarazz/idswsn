@@ -21,8 +21,15 @@ public class SimpleMessageTimer extends Timer {
 	
 	@Override
 	public void fire() {
-		//System.out.println("send the message");
+		//System.out.println("send the message");		
 		BasicNode basicNode = (BasicNode)node;
+		
+		
+		//If the node is dead, don't do anything
+		if (basicNode.getIsDead()){
+			return;
+		}
+		
 		basicNode.beforeSendingMessage(msg);
 		
 		node.broadcast(msg);
