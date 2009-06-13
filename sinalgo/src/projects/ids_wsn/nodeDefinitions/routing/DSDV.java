@@ -163,8 +163,8 @@ public class DSDV implements IRouting {
 		}
 		
 		if (energy.intValue() > node.energy50.intValue() && energy.intValue() < node.energy60.intValue()){
-			node.setMyColor(Color.GRAY);
-			node.setColor(Color.GRAY);
+			node.setMyColor(Color.LIGHT_GRAY);
+			node.setColor(Color.LIGHT_GRAY);
 			if (!node.send60){
 				sendBeacon = Boolean.TRUE;
 				node.send60 = Boolean.TRUE;
@@ -172,8 +172,8 @@ public class DSDV implements IRouting {
 		}
 		
 		if (energy.intValue() > node.energy40.intValue() && energy.intValue() < node.energy50.intValue()){
-			node.setMyColor(Color.DARK_GRAY);
-			node.setColor(Color.DARK_GRAY);
+			node.setMyColor(Color.GRAY);
+			node.setColor(Color.GRAY);
 			if (!node.send50){
 				sendBeacon = Boolean.TRUE;
 				node.send50 = Boolean.TRUE;

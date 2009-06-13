@@ -1,4 +1,4 @@
-5s ro1) REDE OPERANDO NORMALMENTE SEM MONITORES
+1) REDE OPERANDO NORMALMENTE SEM MONITORES
 
 -project ids_wsn -gen 4 ids_wsn:BaseStation PositionFile (/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/src/projects/ids_wsn/4basestation.pos) 
              -gen 100 ids_wsn:NormalNode PositionFile (/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/src/projects/ids_wsn/100basicnodes.pos) 

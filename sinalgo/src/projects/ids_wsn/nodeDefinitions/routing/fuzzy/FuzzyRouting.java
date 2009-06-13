@@ -26,6 +26,9 @@ public class FuzzyRouting implements IRouting {
 	//Fuzzy Routing Table
 	protected Hashtable<Node, FuzzyRoutingEntry> fuzzyRoutingTable = new Hashtable<Node, FuzzyRoutingEntry>();
 	
+	//Guarantee the node-disjoint path
+	protected Hashtable<Node, Integer> numHopsByNode = new Hashtable<Node, Integer>();
+	
 	private BasicNode node;
 
 	public Node getBestRoute(Node destino) {
@@ -162,8 +165,8 @@ public class FuzzyRouting implements IRouting {
 		}
 		
 		if (energy.intValue() > node.energy50.intValue() && energy.intValue() < node.energy60.intValue()){
-			node.setMyColor(Color.GRAY);
-			node.setColor(Color.GRAY);
+			node.setMyColor(Color.LIGHT_GRAY);
+			node.setColor(Color.LIGHT_GRAY);
 			if (!node.send60){
 				sendBeacon = Boolean.TRUE;
 				node.send60 = Boolean.TRUE;
@@ -171,8 +174,8 @@ public class FuzzyRouting implements IRouting {
 		}
 		
 		if (energy.intValue() > node.energy40.intValue() && energy.intValue() < node.energy50.intValue()){
-			node.setMyColor(Color.DARK_GRAY);
-			node.setColor(Color.DARK_GRAY);
+			node.setMyColor(Color.GRAY);
+			node.setColor(Color.GRAY);
 			if (!node.send50){
 				sendBeacon = Boolean.TRUE;
 				node.send50 = Boolean.TRUE;
@@ -256,6 +259,7 @@ public class FuzzyRouting implements IRouting {
 		}else if(floodMsg.immediateSource.equals(node)){ // The forwarding node is retransmiting a message that the node have just transmitted.
 			forward = Boolean.FALSE;
 		}else{
+			
 			energy = floodMsg.energy;
 			numHops = floodMsg.hopsToBaseStation;
 			
@@ -266,10 +270,18 @@ public class FuzzyRouting implements IRouting {
 			
 			if (re == null){
 				fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl));
+				//numHopsByNode.put(floodMsg.baseStation, floodMsg.hopsToBaseStation);
 				
 				myLog.logln("Rota;"+Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
 				
 			}else if (!re.containsNodeInNextHop(floodMsg.forwardingNode)){
+				//Integer nh = numHopsByNode.get(floodMsg.baseStation);
+				
+				//If a ndode X receives a flood message from a node Y and node Y is more distant from BS than node X, do nothing
+				//if (floodMsg.hopsToBaseStation > nh){
+				//	return;
+				//}
+				
 				if (re.getFieldsSize() < numBuffer) { 
 					re.addField(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl);
 					myLog.logln("Rota;"+Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
