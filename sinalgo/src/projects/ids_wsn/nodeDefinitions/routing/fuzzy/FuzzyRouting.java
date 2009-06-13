@@ -66,8 +66,7 @@ public class FuzzyRouting implements IRouting {
 		}else if(beaconMessage.immediateSource.equals(node)){ // The forwarding node is retransmiting a message that the node have just transmitted.
 			forward = Boolean.FALSE;
 		}else {
-			FuzzyRoutingEntry re = fuzzyRoutingTable.get(beaconMessage.baseStation);
-			
+			FuzzyRoutingEntry re = fuzzyRoutingTable.get(beaconMessage.baseStation);			
 			RoutingField field = re.getRoutingField(beaconMessage.forwardingNode);
 	
 			if (re.containsNodeInNextHop(beaconMessage.forwardingNode)){
@@ -142,13 +141,13 @@ public class FuzzyRouting implements IRouting {
 			}
 			payloadMessage.imediateSender = node;
 			
-			checkEnergyLevel(immediateSenderOriginal);
+			checkEnergyLevel();
 			sendMessage(payloadMessage);
 			
 		}
 	}
 	
-	private void checkEnergyLevel(Node sender) {
+	private void checkEnergyLevel() {
 		Logging deadLog = Utils.getDeadNodesLog();
 		Float energy = node.getBateria().getEnergy();
 		Boolean sendBeacon = Boolean.FALSE;
@@ -188,18 +187,18 @@ public class FuzzyRouting implements IRouting {
 		}
 		
 		if (node.getUseFuzzyRouting() && sendBeacon){
-			sendBeaconMessage(sender);
+			sendBeaconMessage();
 		}
 	}
 	
 	/**
 	 * This method is used to send a beacon message when the energy level is too low 
 	 */
-	private void sendBeaconMessage(Node nextHop){
+	private void sendBeaconMessage(){
 		BeaconMessage beacon = new BeaconMessage(++node.beaconID, node.getRouting().getSinkNode(), node, node, node);
 		//beacon.nextHop = nextHop;
 		beacon.energy = node.getBateria().getEnergy();
-		this.sendBroadcast(beacon);
+		//this.sendBroadcast(beacon);
 	}
 
 	public void sendBroadcast(Message message) {

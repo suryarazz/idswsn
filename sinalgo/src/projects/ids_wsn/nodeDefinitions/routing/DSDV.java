@@ -14,6 +14,7 @@ import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
+import sinalgo.tools.logging.Logging;
 
 public class DSDV implements IRouting {
 	
@@ -142,7 +143,48 @@ public class DSDV implements IRouting {
 			payloadMessage.nextHop = re.getFirstActiveRoute();
 			payloadMessage.imediateSender = node;
 			
+			checkEnergyLevel();
 			sendMessage(payloadMessage);
+		}
+	}
+	
+	private void checkEnergyLevel() {
+		Logging deadLog = Utils.getDeadNodesLog();
+		Float energy = node.getBateria().getEnergy();
+		Boolean sendBeacon = Boolean.FALSE;
+		
+		if (energy.intValue() > node.energy60.intValue() && energy.intValue() < node.energy70.intValue()){
+			node.setMyColor(Color.MAGENTA);
+			node.setColor(Color.MAGENTA);
+			if (!node.send70){
+				//sendBeacon = Boolean.TRUE;
+				node.send70 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() > node.energy50.intValue() && energy.intValue() < node.energy60.intValue()){
+			node.setMyColor(Color.GRAY);
+			node.setColor(Color.GRAY);
+			if (!node.send60){
+				sendBeacon = Boolean.TRUE;
+				node.send60 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() > node.energy40.intValue() && energy.intValue() < node.energy50.intValue()){
+			node.setMyColor(Color.DARK_GRAY);
+			node.setColor(Color.DARK_GRAY);
+			if (!node.send50){
+				sendBeacon = Boolean.TRUE;
+				node.send50 = Boolean.TRUE;
+			}
+		}
+		
+		if (energy.intValue() <= 0){
+			node.setMyColor(Color.BLACK);
+			node.setColor(Color.BLACK);
+			node.setIsDead(Boolean.TRUE);
+			deadLog.logln(Tools.getGlobalTime()+":"+node.ID);
 		}
 	}
 	
