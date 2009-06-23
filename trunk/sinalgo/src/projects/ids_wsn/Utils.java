@@ -1,5 +1,8 @@
 package projects.ids_wsn;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 import net.sourceforge.jFuzzyLogic.FIS;
 import net.sourceforge.jFuzzyLogic.FunctionBlock;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
@@ -10,9 +13,12 @@ import projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting;
 import projects.ids_wsn.nodes.timers.RestoreColorTime;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
+import sinalgo.nodes.Connections;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.edges.Edge;
 import sinalgo.tools.Tools;
 import sinalgo.tools.logging.Logging;
+import sinalgo.tools.storage.ReusableListIterator;
 
 public class Utils {
 	
@@ -108,5 +114,32 @@ public class Utils {
 		}
 		return name;
 		
+	}
+	
+	/**
+	 * 
+	 * @param ori
+	 * @param dst
+	 * @return
+	 */
+	public static Boolean isNeighboringNode(Node ori, Node dst){
+		
+		Boolean result = Boolean.FALSE;
+		
+		Node n = null;
+		Edge e = null;
+		Connections conn = ori.outgoingConnections;
+		ReusableListIterator<Edge> listConn = conn.iterator();
+		
+		while (listConn.hasNext()){
+			e = listConn.next();
+			n = e.endNode;
+			
+			if (n.equals(dst)){
+				result = Boolean.TRUE;
+			}
+		}
+		
+		return result;
 	}
 }

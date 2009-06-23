@@ -192,6 +192,7 @@
 	<!-- Routing protocol used in simulations -->
 	<RoutingProtocol value="projects.ids_wsn.nodeDefinitions.routing.DSDV" />
 	<UseFuzzyRouting value="yes" />
+	<NumbersOfRoutesFuzzy value="3" />
 </NetworkLayer>
 
 <SimulationName value="redeNormal"/>
