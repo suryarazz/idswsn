@@ -39,8 +39,8 @@ RULEBLOCK No1
 	ACT : MIN;			// Use 'min' activation method
 	ACCU : MAX;			// Use 'max' accumulation method
 
-	RULE 1 : IF energy IS low AND path_length IS long THEN psl IS very_poor;
-	RULE 2 : IF energy IS low AND path_length IS average OR path_length IS short THEN psl IS poor;
+	RULE 1 : IF energy IS low AND path_length IS long OR path_length is average THEN psl IS very_poor;
+	RULE 2 : IF energy IS low AND path_length IS short THEN psl IS poor;
 	RULE 3 : IF energy IS average AND path_length IS short THEN psl IS high;
 	RULE 6 : IF energy IS average AND path_length IS average THEN psl IS average;
 	RULE 7 : IF energy IS average AND path_length IS long THEN psl IS poor;
