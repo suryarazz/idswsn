@@ -8,13 +8,15 @@ public class RoutingField {
 	private Node nextHop;
 	private Boolean active;
 	private Double fsl;
+	private Integer index;
 	
-	public RoutingField(Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl){
+	public RoutingField(Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl, Integer index){
 		this.sequenceNumber = seq;
 		this.numHops = numHops;
 		this.nextHop = nextHop;
 		this.active = active;
 		this.fsl = fsl;
+		this.index = index;
 	}
 
 	public void setSequenceNumber(Integer sequenceNumber) {
@@ -55,6 +57,10 @@ public class RoutingField {
 
 	public Integer getSequenceNumber() {
 		return sequenceNumber;
+	}
+
+	public Integer getIndex() {
+		return index;
 	}
 
 }

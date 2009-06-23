@@ -1,5 +1,6 @@
 package projects.ids_wsn.nodes.timers;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
+import projects.ids_wsn.nodes.messages.FloodFindFuzzy;
 import projects.ids_wsn.nodes.nodeImplementations.BaseStation;
 import sinalgo.nodes.messages.Message;
 import sinalgo.nodes.timers.Timer;
@@ -25,9 +26,19 @@ public class BaseStationMessageTimer extends Timer {
 	public void fire() {		
 		node.broadcast(msg);
 		if (interval > 0){
-			FloodFindDsdv message = (FloodFindDsdv)msg;
 			BaseStation bs = (BaseStation)node;
-			message.sequenceID = bs.getSequenceID();
+			
+			if (msg instanceof FloodFindDsdv) {
+				FloodFindDsdv message = (FloodFindDsdv)msg;
+				message.sequenceID = bs.getSequenceID();
+			}
+			
+			if (msg instanceof FloodFindFuzzy) {
+				FloodFindFuzzy message = (FloodFindFuzzy)msg;
+				
+				message.sequenceID = bs.getSequenceID();
+			}
+			
 			this.startRelative(interval, node);
 		}
 	}

@@ -9,7 +9,9 @@ import projects.ids_wsn.nodeDefinitions.routing.IRouting;
 import projects.ids_wsn.nodes.messages.BeaconMessage;
 import projects.ids_wsn.nodes.messages.EventMessage;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
+import projects.ids_wsn.nodes.messages.FloodFindFuzzy;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
+import projects.ids_wsn.nodes.nodeImplementations.BaseStation;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
@@ -43,6 +45,8 @@ public class FuzzyRouting implements IRouting {
 	public void receiveMessage(Message message) {
 		if (message instanceof FloodFindDsdv){
 			receiveFloodFindMessage(message);
+		}else if (message instanceof FloodFindFuzzy){
+			receiveFloodFindFuzzy(message);			
 		}else if (message instanceof PayloadMsg){
 			PayloadMsg payloadMessage = (PayloadMsg) message;
 			receivePayloadMessage(payloadMessage);			
@@ -133,7 +137,6 @@ public class FuzzyRouting implements IRouting {
 				}
 			}
 		}else if (payloadMessage.nextHop.equals(node)){
-			Node immediateSenderOriginal = payloadMessage.imediateSender;
 	
 			fre = fuzzyRoutingTable.get(payloadMessage.baseStation);
 			payloadMessage.nextHop = fre.getFirstActiveRoute();
@@ -245,6 +248,88 @@ public class FuzzyRouting implements IRouting {
 
 	}
 	
+	
+	private void receiveFloodFindFuzzy(Message message){
+		Logging myLog = Utils.getGeneralLog();
+		
+		FloodFindFuzzy floodMsg = (FloodFindFuzzy) message;
+		Boolean forward = Boolean.TRUE;
+		Float energy = 0f;
+		Integer numHops = 0;
+		Double fsl = 0d;
+		
+		energy = floodMsg.energy;
+		numHops = floodMsg.hopsToBaseStation;
+		
+		FuzzyRoutingEntry re = fuzzyRoutingTable.get(floodMsg.baseStation);
+		
+		if (floodMsg.immediateDestination != null){
+			if (floodMsg.immediateDestination.equals(node)){ //It is a message sent by the Base Station to its neighbor
+				if (re == null){
+					fsl = Utils.calculateFsl(energy, numHops);
+					fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index));
+					myLog.logln("Rota com Indice"+floodMsg.index + ";" + Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
+				}
+			}else{
+				forward = Boolean.FALSE;
+			}
+		}else{	
+			if (floodMsg.forwardingNode.equals(node)){ // The message bounced back. The node must discard the msg.
+				forward = Boolean.FALSE;
+			}else if(floodMsg.immediateSource.equals(node)){ // The forwarding node is retransmiting a message that the node have just transmitted.
+				forward = Boolean.FALSE;
+			}
+			else if (Utils.isNeighboringNode(node, floodMsg.baseStation)){ //If the node is neighbor from Sink Node, do nothing
+				forward = Boolean.FALSE;								
+			}else{
+				if (re == null){
+					fsl = Utils.calculateFsl(energy, numHops);
+					fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index));
+					myLog.logln("Rota com Indice"+floodMsg.index + ";" + Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
+				}else if (!re.hasRouteWithIndex(floodMsg.index) && !re.containsNodeInNextHop(floodMsg.forwardingNode)){ // If the node does not have a route with indice i and does not have a route passing by forwarding node
+					fsl = Utils.calculateFsl(energy, numHops);
+					re.addField(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index);
+					myLog.logln("Rota com Indice"+floodMsg.index + ";" +Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
+				}else{
+					RoutingField field = re.getRouteWithIndexAndNode(floodMsg.index, floodMsg.forwardingNode);
+					if (field != null){ //Verificar se a rota que o nó possui para o indice usa o floodMsg.forwardingNode como NextHop 
+						if (field.getSequenceNumber() < floodMsg.sequenceID) { //Update an existing entrie
+							fsl = Utils.calculateFsl(energy, numHops);
+							
+							field.setNumHops(floodMsg.hopsToBaseStation);
+							field.setSequenceNumber(floodMsg.sequenceID);
+							field.setNextHop((Node)floodMsg.forwardingNode);
+							field.setFsl(fsl);
+							myLog.logln("Rota com Indice" + floodMsg.index + ";" + Tools.getGlobalTime()+";Rota Alterada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
+						}else{
+							forward = Boolean.FALSE;
+						}
+					}else{
+						forward = Boolean.FALSE;
+					}
+				}
+			}
+		}
+		
+		if (forward && floodMsg.ttl > 1){ //Forward the flooding message
+			
+			FloodFindFuzzy copy = (FloodFindFuzzy) floodMsg.clone();
+			
+			//We have to store the lowest energy found in the path
+			if (node.getBateria().getEnergy().compareTo(copy.energy)<0){
+				copy.energy = node.getBateria().getEnergy();				
+			}
+			
+			copy.immediateSource = copy.forwardingNode;
+			copy.forwardingNode = node;
+			copy.ttl--;
+			copy.hopsToBaseStation++;
+			copy.immediateDestination = null;
+			sendBroadcast(copy);
+		}		
+	}
+	
+	
 	private void receiveFloodFindMessage(Message message){
 		Logging myLog = Utils.getGeneralLog();
 		
@@ -269,7 +354,7 @@ public class FuzzyRouting implements IRouting {
 			FuzzyRoutingEntry re = fuzzyRoutingTable.get(floodMsg.baseStation);
 			
 			if (re == null){
-				fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl));
+				fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl, 0));
 				//numHopsByNode.put(floodMsg.baseStation, floodMsg.hopsToBaseStation);
 				
 				myLog.logln("Rota;"+Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
@@ -283,10 +368,10 @@ public class FuzzyRouting implements IRouting {
 				//}
 				
 				if (re.getFieldsSize() < numBuffer) { 
-					re.addField(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl);
+					re.addField(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl,0);
 					myLog.logln("Rota;"+Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
 				}else{
-					Boolean result = re.exchangeRoute(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl);
+					Boolean result = re.exchangeRoute(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl, 0);
 					if (result) myLog.logln("Rota;"+Tools.getGlobalTime()+";Rota Trocada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl); 
 				}
 				forward = Boolean.FALSE;

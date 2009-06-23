@@ -12,13 +12,13 @@ import sinalgo.nodes.Node;
 public class FuzzyRoutingEntry {
 	private List<RoutingField> fields = new ArrayList<RoutingField>();
 	
-	public FuzzyRoutingEntry (Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl){
-		addField(seq, numHops, nextHop, active, fsl);
+	public FuzzyRoutingEntry (Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl, Integer index){
+		addField(seq, numHops, nextHop, active, fsl, index);
 				
 	}
 	
-	public void addField(Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl){
-		RoutingField r = new RoutingField(seq, numHops, nextHop, active, fsl);
+	public void addField(Integer seq, Integer numHops, Node nextHop, Boolean active, Double fsl, Integer index){
+		RoutingField r = new RoutingField(seq, numHops, nextHop, active, fsl, index);
 		fields.add(r);		
 	}
 	
@@ -98,11 +98,11 @@ public class FuzzyRoutingEntry {
 	 * @param active
 	 * @param fsl
 	 */
-	public Boolean exchangeRoute(Integer seq, Integer numHops, BasicNode nextHop, Boolean active, Double fsl){
+	public Boolean exchangeRoute(Integer seq, Integer numHops, BasicNode nextHop, Boolean active, Double fsl, Integer index){
 		
 		Boolean result = Boolean.FALSE;
 		
-		RoutingField r = new RoutingField(seq, numHops, nextHop, active, fsl);
+		RoutingField r = new RoutingField(seq, numHops, nextHop, active, fsl, index);
 		
 		//
 		Collections.sort(fields, new FslComparator(Order.ASC));
@@ -135,5 +135,31 @@ public class FuzzyRoutingEntry {
 	
 	public List<RoutingField> getRoutingFields(){
 		return fields;
+	}
+	
+	public Boolean hasRouteWithIndex(Integer index){
+		Boolean result = Boolean.FALSE;
+		
+		for (RoutingField f : fields){
+			if (f.getIndex().equals(index)){
+				result = Boolean.TRUE;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	public RoutingField getRouteWithIndexAndNode(Integer index, Node node){
+		RoutingField result = null;
+		
+		for (RoutingField f : fields){
+			if (f.getIndex().equals(index) && f.getNextHop().equals(node)){
+				result = f;
+				break;
+			}
+		}
+		
+		return result;
 	}
 }
