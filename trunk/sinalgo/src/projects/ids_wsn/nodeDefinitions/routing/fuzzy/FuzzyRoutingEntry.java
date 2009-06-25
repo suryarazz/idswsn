@@ -162,4 +162,17 @@ public class FuzzyRoutingEntry {
 		
 		return result;
 	}
+	
+	public RoutingField getRouteWithIndex(Integer index){
+		RoutingField result = null;
+		
+		for (RoutingField f : fields){
+			if (f.getIndex().equals(index)){
+				result = f;
+				break;
+			}
+		}
+		
+		return result;
+	}
 }

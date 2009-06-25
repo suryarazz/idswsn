@@ -286,7 +286,7 @@ public class FuzzyRouting implements IRouting {
 					fsl = Utils.calculateFsl(energy, numHops);
 					fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index));
 					myLog.logln("Rota com Indice"+floodMsg.index + ";" + Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
-				}else if (!re.hasRouteWithIndex(floodMsg.index) && !re.containsNodeInNextHop(floodMsg.forwardingNode)){ // If the node does not have a route with indice i and does not have a route passing by forwarding node
+				}else if (!re.hasRouteWithIndex(floodMsg.index) && !re.containsNodeInNextHop(floodMsg.forwardingNode)){ // If the node does not have a route with indice i and does not have a route passing by forwarding node 
 					fsl = Utils.calculateFsl(energy, numHops);
 					re.addField(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index);
 					myLog.logln("Rota com Indice"+floodMsg.index + ";" +Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
@@ -448,7 +448,7 @@ public class FuzzyRouting implements IRouting {
 			FuzzyRoutingEntry fre = fuzzyRoutingTable.get(node);
 			
 			for (RoutingField field : fre.getRoutingFields()){
-				Tools.appendToOutput("BS: "+node.ID+" / NextHop: "+field.getNextHop()+" / FSL: "+field.getFsl()+"\n");
+				Tools.appendToOutput("BS: "+node.ID+" / NextHop: "+field.getNextHop()+" / FSL: "+field.getFsl()+" / Ind: "+field.getIndex()+"\n");
 			}	
 		}
 	}
