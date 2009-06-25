@@ -3,15 +3,16 @@ package projects.ids_wsn.nodes.nodeImplementations;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-import projects.ids_wsn.Utils;
+import projects.ids_wsn.comparators.EnergyComparator;
+import projects.ids_wsn.enumerators.Order;
+import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.FloodFindFuzzy;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.BaseStationMessageTimer;
+import projects.ids_wsn.nodes.timers.BaseStationRepeatMessageTimer;
 import projects.ids_wsn.nodes.timers.RestoreColorBSTime;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
@@ -95,29 +96,34 @@ public class BaseStation extends Node {
 	public void sendMessageTo(){	
 		FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this, this);
 		floodMsg.energy = 500000;
-		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg, 0);
+		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg);
 		t.startRelative(1, this);
 		this.isRouteBuild = Boolean.TRUE;
 	}
 	
 	@NodePopupMethod(menuText="Build routing tree - Fuzzy")
 	public void sendMessageFuzzyTo(){	
+		BaseStationRepeatMessageTimer t = new BaseStationRepeatMessageTimer(1500);
+		t.startRelative(1, this);
 		
-		Map<Integer, Node> mapNodes = getNeighboringNodes();
+	}
+	
+	public void prepareSendRouteMessage(){
+		List<BasicNode> listNodes = getNeighboringNodes();
 		
-		for (Node n : mapNodes.values()){
+		for (Node n : listNodes){
 			for (int x = 0; x < this.numberOfRoutes; x++){
 				sendRouteMessage(x, n);
 			}
-		}
+		}		
 	}
 	
 	private void sendRouteMessage(Integer index, Node dst) {
 		FloodFindFuzzy floodMsg = new FloodFindFuzzy(++sequenceID, this, this, this, this, index, dst);
 		//FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this, this);
 		floodMsg.energy = 500000;
-		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg, 1500);
-		t.startRelative(index+1, this);
+		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg);
+		t.startRelative((index+1)*2, this);
 		this.isRouteBuild = Boolean.TRUE;
 		
 	}
@@ -143,8 +149,8 @@ public class BaseStation extends Node {
 		return ++sequenceID;
 	}
 	
-	private Map<Integer, Node> getNeighboringNodes(){
-		Map<Integer, Node> mapNodes = new Hashtable<Integer, Node>();
+	private List<BasicNode> getNeighboringNodes(){
+		List<BasicNode> listNodes = new ArrayList<BasicNode>();
 		Node n = null;
 		Edge e = null;
 		Integer index = 0;
@@ -154,11 +160,13 @@ public class BaseStation extends Node {
 		while (listConn.hasNext()){
 			e = listConn.next();
 			n = e.endNode;
-			mapNodes.put(index, n);
+			if (n instanceof BasicNode)
+				listNodes.add((BasicNode)n);
 			index++;
 		}
 		
-		return mapNodes;
+		Collections.sort(listNodes,new EnergyComparator(Order.DESC));
+		return listNodes;
 	}
 	
 

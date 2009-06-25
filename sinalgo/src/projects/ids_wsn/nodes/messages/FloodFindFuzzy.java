@@ -1,0 +1,93 @@
+package projects.ids_wsn.nodes.messages;
+
+import sinalgo.nodes.Node;
+import sinalgo.nodes.messages.Message;
+
+/**
+ * The message used to determine a route between two nodes using
+ * incremental flooding.
+ * This message requires the read-only policy. 
+ */
+public class FloodFindFuzzy extends Message {
+
+	/**
+	 * The TTL for this message when it's being sent as a find-msg
+	 */
+	public int ttl;
+	
+	/**
+	 * The Reference to the BaseStation
+	 */
+	public Node baseStation;
+	
+	/**
+	 * The node who is forwarding the flood message
+	 */
+	public Node forwardingNode;
+	
+	/**
+	 * The immediate Source of the message.
+	 */
+	public Node immediateSource;
+	
+	/**
+	 * The source of the message
+	 */
+	public Node source;
+	
+	/**
+	 * The immediate Destination of the message.
+	 */
+	public Node immediateDestination;
+	
+	
+	/**
+	 * Number of hops to BaseStation 
+	 */
+	public int hopsToBaseStation;
+	
+	/**
+	 * Sequence ID of this message 
+	 */
+	public int sequenceID; 
+	
+	/**
+	 * Index of the  route
+	 */
+	public int index;
+	
+	/**
+	 * The lowest node energy collected during the packet routing
+	 */
+	public float energy;
+	
+	/**
+	 * Default constructor. 
+	 */
+	public FloodFindFuzzy(int seqID, Node baseStation, Node immediateSource, Node forwardingNode, Node source, Integer index, Node dst) {
+		ttl = 20; // initial TTL
+		hopsToBaseStation = 0;
+		sequenceID = seqID;
+		this.baseStation = baseStation;
+		this.forwardingNode = forwardingNode;
+		this.immediateSource = immediateSource;
+		this.source = source;
+		this.index = index;
+		this.immediateDestination = dst;
+	}
+	
+	@Override
+	public Message clone() {
+		FloodFindFuzzy msg = new FloodFindFuzzy(this.sequenceID, this.baseStation, this.immediateSource, this.forwardingNode, this.source, this.index, this.immediateDestination);
+		msg.ttl = this.ttl;
+		msg.hopsToBaseStation = this.hopsToBaseStation;
+		msg.forwardingNode = this.forwardingNode;
+		msg.energy = this.energy;
+		return msg;
+	}
+	
+	@Override
+	public String toString() {
+		return "SeqID: "+this.sequenceID+" /BS: "+this.baseStation+" / FwdNode: "+this.forwardingNode+" / iSource: "+this.immediateSource;
+	}
+}
