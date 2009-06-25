@@ -11,7 +11,6 @@ import projects.ids_wsn.nodes.messages.EventMessage;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.FloodFindFuzzy;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
-import projects.ids_wsn.nodes.nodeImplementations.BaseStation;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
