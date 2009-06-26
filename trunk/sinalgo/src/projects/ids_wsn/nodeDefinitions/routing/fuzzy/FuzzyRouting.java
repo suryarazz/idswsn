@@ -284,28 +284,25 @@ public class FuzzyRouting implements IRouting {
 				if (re == null){
 					fsl = Utils.calculateFsl(energy, numHops);
 					fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index));
-					myLog.logln("Rota com Indice"+floodMsg.index + ";" + Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
-				}else if (!re.hasRouteWithIndex(floodMsg.index) && !re.containsNodeInNextHop(floodMsg.forwardingNode)){ // If the node does not have a route with indice i and does not have a route passing by forwarding node 
-					fsl = Utils.calculateFsl(energy, numHops);
-					re.addField(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index);
-					myLog.logln("Rota com Indice"+floodMsg.index + ";" +Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
+					myLog.logln("Rota com Indice"+floodMsg.index + ";" + Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl); 
 				}else{
-					RoutingField field = re.getRouteWithIndexAndNode(floodMsg.index, floodMsg.forwardingNode);
-					if (field != null){ //Verificar se a rota que o nó possui para o indice usa o floodMsg.forwardingNode como NextHop 
-						if (field.getSequenceNumber() < floodMsg.sequenceID) { //Update an existing entrie
-							fsl = Utils.calculateFsl(energy, numHops);
-							
-							field.setNumHops(floodMsg.hopsToBaseStation);
-							field.setSequenceNumber(floodMsg.sequenceID);
-							field.setNextHop((Node)floodMsg.forwardingNode);
-							field.setFsl(fsl);
-							myLog.logln("Rota com Indice" + floodMsg.index + ";" + Tools.getGlobalTime()+";Rota Alterada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
-						}else{
-							forward = Boolean.FALSE;
-						}
+					RoutingField field = re.getFirstRoutingEntry(); 
+					if (field.getSequenceNumber() < floodMsg.sequenceID) { //Update an existing entrie
+						
+						fuzzyRoutingTable.remove(floodMsg.baseStation); //Removing the old route do BaseStation
+						
+						fsl = Utils.calculateFsl(energy, numHops);
+						//Putting the new route to the BaseStation
+						fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index));
+						myLog.logln("Tabela de rota zerada. Novo broadcast do Sink" + floodMsg.index + ";" + Tools.getGlobalTime()+";Rota Alterada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
+					}else if (!re.hasRouteWithIndex(floodMsg.index) && !re.containsNodeInNextHop(floodMsg.forwardingNode)){ // If the node does not have a route with indice i and does not have a route passing by forwarding node 
+						fsl = Utils.calculateFsl(energy, numHops);
+						re.addField(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (BasicNode)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index);
+						myLog.logln("Rota com Indice"+floodMsg.index + ";" +Tools.getGlobalTime()+";Rota Adicionada;"+node.ID+";"+floodMsg.baseStation+";"+floodMsg.forwardingNode.ID+";"+floodMsg.sequenceID+";"+floodMsg.hopsToBaseStation+";"+floodMsg.energy+";"+fsl);
 					}else{
 						forward = Boolean.FALSE;
 					}
+					
 				}
 			}
 		}

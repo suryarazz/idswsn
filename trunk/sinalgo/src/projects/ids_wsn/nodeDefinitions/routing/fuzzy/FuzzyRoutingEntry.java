@@ -7,6 +7,7 @@ import java.util.List;
 import projects.ids_wsn.comparators.FslComparator;
 import projects.ids_wsn.enumerators.Order;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
+import projects.ids_wsn.nodes.nodeImplementations.BaseStation;
 import sinalgo.nodes.Node;
 
 public class FuzzyRoutingEntry {
@@ -172,6 +173,14 @@ public class FuzzyRoutingEntry {
 				break;
 			}
 		}
+		
+		return result;
+	}
+	
+	public RoutingField getFirstRoutingEntry(){
+		RoutingField result = null;
+		
+		result = fields.get(0);
 		
 		return result;
 	}

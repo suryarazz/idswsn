@@ -47,7 +47,7 @@ public class FloodFindFuzzy extends Message {
 	public int hopsToBaseStation;
 	
 	/**
-	 * Sequence ID of this message 
+	 * Index Sequence ID of this message 
 	 */
 	public int sequenceID; 
 	
@@ -57,6 +57,11 @@ public class FloodFindFuzzy extends Message {
 	public int index;
 	
 	/**
+	 * BasicStation GlobalID. Necessary when the Basic wants to send a new broadcast
+	 */
+	public int broadcastID;
+	
+	/**
 	 * The lowest node energy collected during the packet routing
 	 */
 	public float energy;
@@ -64,7 +69,7 @@ public class FloodFindFuzzy extends Message {
 	/**
 	 * Default constructor. 
 	 */
-	public FloodFindFuzzy(int seqID, Node baseStation, Node immediateSource, Node forwardingNode, Node source, Integer index, Node dst) {
+	public FloodFindFuzzy(int seqID, Node baseStation, Node immediateSource, Node forwardingNode, Node source, Integer index, Node dst, int broadcastID) {
 		ttl = 20; // initial TTL
 		hopsToBaseStation = 0;
 		sequenceID = seqID;
@@ -73,12 +78,13 @@ public class FloodFindFuzzy extends Message {
 		this.immediateSource = immediateSource;
 		this.source = source;
 		this.index = index;
+		this.broadcastID = broadcastID;
 		this.immediateDestination = dst;
 	}
 	
 	@Override
 	public Message clone() {
-		FloodFindFuzzy msg = new FloodFindFuzzy(this.sequenceID, this.baseStation, this.immediateSource, this.forwardingNode, this.source, this.index, this.immediateDestination);
+		FloodFindFuzzy msg = new FloodFindFuzzy(this.sequenceID, this.baseStation, this.immediateSource, this.forwardingNode, this.source, this.index, this.immediateDestination, this.broadcastID);
 		msg.ttl = this.ttl;
 		msg.hopsToBaseStation = this.hopsToBaseStation;
 		msg.forwardingNode = this.forwardingNode;
