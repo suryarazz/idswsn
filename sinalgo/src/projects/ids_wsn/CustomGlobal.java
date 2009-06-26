@@ -40,16 +40,13 @@ package projects.ids_wsn;
 import java.awt.Color;
 
 import javax.swing.JOptionPane;
-
-import projects.ids_old.events.BasicEvent;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
-
+import projects.ids_wsn.nodes.nodeImplementations.SimpleEvent;
 import sinalgo.io.positionFile.PositionFileIO;
 import sinalgo.nodes.Connections;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.edges.Edge;
 import sinalgo.runtime.AbstractCustomGlobal;
-import sinalgo.runtime.AbstractCustomGlobal.GlobalMethod;
 import sinalgo.tools.Tools;
 import sinalgo.tools.logging.Logging;
 import sinalgo.tools.storage.ReusableListIterator;
@@ -141,7 +138,7 @@ public class CustomGlobal extends AbstractCustomGlobal{
 	public void removeBasicEventEdges() {
 		for(Node n : Tools.getNodeList()) {
 			
-			if (n instanceof BasicEvent){
+			if (n instanceof SimpleEvent){
 				Connections conn = n.outgoingConnections;
 				ReusableListIterator<Edge> edgeList = conn.iterator();
 				edgeList.reset();

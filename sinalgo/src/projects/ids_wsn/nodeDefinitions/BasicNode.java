@@ -85,7 +85,7 @@ public abstract class BasicNode extends Node{
 		
 		try {
 			//Here, we have to get the routing protocol from Config.xml and inject into routing attribute
-			String routingProtocol = Configuration.getStringParameter("NetworkLayer/RoutingProtocol");
+			String routingProtocol = Configuration.getStringParameter("NetworkLayer/RoutingProtocolName");
 			routing = Utils.StringToRoutingProtocol(routingProtocol);
 			routing.setNode(this);
 		} catch (CorruptConfigurationEntryException e) {

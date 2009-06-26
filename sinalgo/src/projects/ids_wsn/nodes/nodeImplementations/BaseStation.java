@@ -36,6 +36,8 @@ public class BaseStation extends Node {
 	
 	private Integer numberOfRoutes;
 	
+	private Integer broadcastID = 0;
+	
 	public Boolean getIsRouteBuild() {
 		return isRouteBuild;
 	}
@@ -110,16 +112,23 @@ public class BaseStation extends Node {
 	
 	public void prepareSendRouteMessage(){
 		List<BasicNode> listNodes = getNeighboringNodes();
+		broadcastID++;
 		
+		/*
 		for (Node n : listNodes){
 			for (int x = 0; x < this.numberOfRoutes; x++){
-				sendRouteMessage(x, n);
+				sendRouteMessage(x, n, broadcastID);
 			}
-		}		
+		}*/
+		int x = 0;
+		for (Node n : listNodes){
+			x = x + 1;
+			sendRouteMessage(x, n, broadcastID);
+		}
 	}
 	
-	private void sendRouteMessage(Integer index, Node dst) {
-		FloodFindFuzzy floodMsg = new FloodFindFuzzy(++sequenceID, this, this, this, this, index, dst);
+	private void sendRouteMessage(Integer index, Node dst, int broadcastID) {
+		FloodFindFuzzy floodMsg = new FloodFindFuzzy(broadcastID, this, this, this, this, index, dst, broadcastID);
 		//FloodFindDsdv floodMsg = new FloodFindDsdv(++sequenceID, this, this, this, this);
 		floodMsg.energy = 500000;
 		BaseStationMessageTimer t = new BaseStationMessageTimer(floodMsg);

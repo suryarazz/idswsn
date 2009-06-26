@@ -190,8 +190,8 @@
 
 <NetworkLayer>
 	<!-- Routing protocol used in simulations -->
-	<RoutingProtocol value="projects.ids_wsn.nodeDefinitions.routing.DSDV" />
-	<UseFuzzyRouting value="yes" />
+	<RoutingProtocolName value="projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting" />
+	<UseFuzzyRouting value="no" />
 	<NumbersOfRoutesFuzzy value="3" />
 </NetworkLayer>
 
