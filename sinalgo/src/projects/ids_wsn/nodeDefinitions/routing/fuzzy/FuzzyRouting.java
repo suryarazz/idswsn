@@ -437,9 +437,8 @@ public class FuzzyRouting implements IRouting {
 	public void printRoutingTable() {
 		Enumeration<Node> nodes = fuzzyRoutingTable.keys();
 		
-		
+		Tools.clearOutput();
 		while (nodes.hasMoreElements()){
-			Tools.clearOutput();
 			Node node = nodes.nextElement();
 			FuzzyRoutingEntry fre = fuzzyRoutingTable.get(node);
 			
