@@ -114,12 +114,6 @@ public class BaseStation extends Node {
 		List<BasicNode> listNodes = getNeighboringNodes();
 		broadcastID++;
 		
-		/*
-		for (Node n : listNodes){
-			for (int x = 0; x < this.numberOfRoutes; x++){
-				sendRouteMessage(x, n, broadcastID);
-			}
-		}*/
 		int x = 0;
 		for (Node n : listNodes){
 			x = x + 1;

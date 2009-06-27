@@ -18,7 +18,7 @@ import sinalgo.tools.logging.Logging;
 
 public class DSDV implements IRouting {
 	
-	private final static Integer NUM_MAX_ENTRIES_PER_ROUTE = 3; 
+	private final static Integer NUM_MAX_ENTRIES_PER_ROUTE = 1; 
 	
 	//Node who is using the protocol
 	private BasicNode node;
