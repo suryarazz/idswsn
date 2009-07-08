@@ -38,6 +38,8 @@ public class BaseStation extends Node {
 	
 	private Integer broadcastID = 0;
 	
+	private Boolean printReceivedMessage =  Boolean.FALSE;
+	
 	public Boolean getIsRouteBuild() {
 		return isRouteBuild;
 	}
@@ -58,11 +60,23 @@ public class BaseStation extends Node {
 				if ((payloadMessage.nextHop == null) ||
 						(payloadMessage.nextHop.equals(this))){
 						countReceivedMessages++;
-						controlColor();					
+						controlColor();		
+						if (printReceivedMessage){
+							Tools.appendToOutput("ID: "+payloadMessage.sender.ID+" /Msg: "+payloadMessage.sequenceNumber+" /Timer: "+Tools.getGlobalTime()+"\n");
+						}
 				}
 			}
 		}
-		
+	}
+	
+	
+	@NodePopupMethod(menuText="Enable/Disable the printing of received messages")
+	public void enableDisableImpMsg(){
+		Tools.clearOutput();
+		if (printReceivedMessage) 
+			printReceivedMessage = Boolean.FALSE; 
+		else 
+			printReceivedMessage = Boolean.TRUE;
 	}
 	
 	@NodePopupMethod(menuText="Print the number of received messages")

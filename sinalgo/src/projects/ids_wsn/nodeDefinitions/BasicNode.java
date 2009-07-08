@@ -214,7 +214,7 @@ public abstract class BasicNode extends Node{
 	 */
 	protected void postProcessingMessage(Message message){}
 	
-	public void beforeSendingMessage(Message message){}
+	public Boolean beforeSendingMessage(Message message){ return Boolean.TRUE; }
 	public void afterSendingMessage(Message message){}
 
 	public IEnergy getBateria() {

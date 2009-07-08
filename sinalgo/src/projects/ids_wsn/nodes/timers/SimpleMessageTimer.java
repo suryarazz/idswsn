@@ -30,13 +30,12 @@ public class SimpleMessageTimer extends Timer {
 			return;
 		}
 		
-		basicNode.beforeSendingMessage(msg);
+		if (basicNode.beforeSendingMessage(msg)) {		
+			node.broadcast(msg);
 		
-		node.broadcast(msg);
-		
-		basicNode.afterSendingMessage(msg);
-		
-		//Spent energy due to the send of the message
-		basicNode.getBateria().spend(EnergyMode.SEND);
+			basicNode.afterSendingMessage(msg);
+			//Spent energy due to the send of the message
+			basicNode.getBateria().spend(EnergyMode.SEND);
+		}
 	}
 }
