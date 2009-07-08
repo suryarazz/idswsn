@@ -455,4 +455,37 @@ public class FuzzyRouting implements IRouting {
 		}
 	}
 
+	public void sendMessageWithTimer(Message message, Integer timer) {
+		if (node.getIsDead()){
+			return;
+		}
+		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
+		messageTimer.startRelative(timer, node);
+		controlColor();
+		
+	}
+
+	public void sendMessageWithTimer(Integer value, Integer timer) {
+		if (node.getIsDead()){
+			return;
+		}
+		
+		if (fuzzyRoutingTable.isEmpty()){
+			return;
+		}
+		
+		node.seqID++;
+		Node destino = getSinkNode();
+		Node nextHopToDestino = getBestRoute(destino);
+		
+		PayloadMsg msg = new PayloadMsg(destino, node, nextHopToDestino, node);
+		msg.value = value;
+		msg.immediateSource = node;
+		msg.sequenceNumber = ++this.seqID;
+		
+		SimpleMessageTimer messageTimer = new SimpleMessageTimer(msg);
+		messageTimer.startRelative(timer, node);
+		controlColor();
+	}
+
 }

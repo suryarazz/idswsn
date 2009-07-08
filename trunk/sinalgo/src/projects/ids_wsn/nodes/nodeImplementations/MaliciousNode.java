@@ -11,7 +11,7 @@ import sinalgo.nodes.messages.Message;
 public class MaliciousNode extends BasicNode implements IAttack {
 
 	//How many packtes the node is current replaying
-	private Integer currentAttacks;
+	protected Integer currentAttacks;
 	
 	@Override
 	public void init() {
@@ -19,6 +19,7 @@ public class MaliciousNode extends BasicNode implements IAttack {
 		setMyColor(Color.DARK_GRAY);
 		super.init();
 	}
+	
 	@Override
 	protected void postProcessingMessage(Message message) {
 		IAttack attack1 = new RepetitionAttack(this);

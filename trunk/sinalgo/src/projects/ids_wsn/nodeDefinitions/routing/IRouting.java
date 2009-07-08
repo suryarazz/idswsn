@@ -7,6 +7,8 @@ import sinalgo.nodes.messages.Message;
 public interface IRouting {
 	public void sendMessage(Integer value);
 	public void sendMessage(Message message);
+	public void sendMessageWithTimer(Message message, Integer timer);
+	public void sendMessageWithTimer(Integer value, Integer timer);
 	public void sendBroadcast(Message message);
 	public void receiveMessage(Message message);
 	public void setNode(BasicNode node);

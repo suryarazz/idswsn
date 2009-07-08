@@ -74,11 +74,12 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	}
 	
 	@Override
-	public void beforeSendingMessage(Message message) {
+	public Boolean beforeSendingMessage(Message message) {
 		if (message instanceof PayloadMsg){
 			PayloadMsg msg = (PayloadMsg) message;
 			addMessageToList(msg);
 		}
+		return Boolean.TRUE;
 	}
 	
 	private void applyRules(){

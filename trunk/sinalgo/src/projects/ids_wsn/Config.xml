@@ -208,6 +208,10 @@
 	<Repetition>
 		<Quantity value="1" />
 	</Repetition>
+	<Exhaustion>
+		<Quantity value="10" />
+		<Timer value="2" />
+	</Exhaustion>
 </Attack>
 
 <LogFiles>

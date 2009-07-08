@@ -1,6 +1,4 @@
 package projects.ids_wsn.nodeDefinitions.malicious.decorator;
-
-import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.malicious.IAttack;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.nodeImplementations.MaliciousNode;
@@ -42,13 +40,12 @@ public class RepetitionAttack extends AttackDecorator implements IAttack {
 			
 			//The malicious node will repeat only the messages which he is the next Hop.
 			if (malNode.isNodeNextHop(payloadMsg.nextHop)){			
-				if (malNode.getCurrentAttacks() >= maxReplayMsg){
-					malNode.getRouting().sendMessage(message);
-				}else{
+				if (malNode.getCurrentAttacks() < maxReplayMsg){
 					RepetitionTimer repTimer = new RepetitionTimer(payloadMsg,40);
 					repTimer.startRelative(1, node);
+					malNode.setCurrentAttacks(malNode.getCurrentAttacks()+1);
 				}
-				malNode.setCurrentAttacks(malNode.getCurrentAttacks()+1);
+				
 			}
 		}
 		
