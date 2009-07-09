@@ -8,6 +8,7 @@ import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.Monitor.DataMessage;
 import projects.ids_wsn.nodeDefinitions.Monitor.IMonitor;
 import projects.ids_wsn.nodeDefinitions.Monitor.Rules;
+import projects.ids_wsn.nodeDefinitions.Monitor.decorator.IntervalRule;
 import projects.ids_wsn.nodeDefinitions.Monitor.decorator.RepetitionRule;
 import projects.ids_wsn.nodeDefinitions.Monitor.decorator.RetransmissionRule;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
@@ -24,6 +25,9 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	
 	//Local inference list of nodes who have bronken the repetition rule
 	private List<Node> listLocalRepetitionNodes;
+	
+	//Local inference list of nodes who have bronken the interval rule
+	private List<Node> listLocalIntervalNodes;
 	
 	private Integer internalBuffer;
 
@@ -85,7 +89,10 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	private void applyRules(){
 		IMonitor rule1 = new RepetitionRule(this);
 		IMonitor rule2 = new RetransmissionRule(rule1);
-		rule2.doInference();
+		IMonitor rule3 = new IntervalRule(rule2);
+		rule3.doInference();
+		
+		//TODO: Implement the peer-to-peer colaboration
 	}
 
 	public List<DataMessage> getDataMessage() {
@@ -99,15 +106,27 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	public List<Node> getListLocalRepetitionNodes() {
 		return listLocalRepetitionNodes;
 	}
-	
+
+	public void setListLocalIntervalNodes(List<Node> listLocalIntervalNodes) {
+		this.listLocalIntervalNodes = listLocalIntervalNodes;
+		
+		for (Node n : this.listLocalIntervalNodes){
+			System.out.println("Monitor "+this.ID+ " discovered node "+n.ID+" breaking the interval rule");
+		}
+	}
+
+	public List<Node> getListLocalIntervalNodes() {
+		return listLocalIntervalNodes;
+	}
 	
 	public void setLocalMaliciousList(Rules rule, List<Node> lista) {
 		switch (rule) {
-		case REPETITION:
-			setListLocalRepetitionNodes(lista);						
-			break;
+			case REPETITION:
+				setListLocalRepetitionNodes(lista);						
+				break;
+			case INTERVAL:
+				setListLocalIntervalNodes(lista);
+				break;
 		}
-		
 	}
-
 }

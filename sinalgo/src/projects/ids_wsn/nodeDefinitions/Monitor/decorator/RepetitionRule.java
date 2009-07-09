@@ -19,11 +19,11 @@ public class RepetitionRule extends RulesDecorator {
 	
 	@Override
 	public void doInference() {
-		applayRepetitionRule();				
+		applyRepetitionRule();				
 		super.doInference();
 	}
 	
-	private void applayRepetitionRule(){
+	private void applyRepetitionRule(){
 		Integer tamBuffer = getDataMessage().size();
 		List<Node> listTempNodes = new ArrayList<Node>();
 		List<DataMessage> listTempDataMessage = new ArrayList<DataMessage>();
@@ -113,11 +113,6 @@ public class RepetitionRule extends RulesDecorator {
 				listNodes.add(node);
 			}
 		}
-		
-		
-		//TODO: Here, we must implement the peer-to-peer collaboration.
-		//We have to send the LocalInferenceMessage to the supervisor responsible for the
-		//Repetition rule
 		
 		return listNodes;
 	}

@@ -199,7 +199,7 @@ public class DSDV implements IRouting {
 			return;
 		}
 		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
-		messageTimer.startRelative(1, node);
+		messageTimer.startRelative(2, node);
 		controlColor();
 	}
 
@@ -243,7 +243,7 @@ public class DSDV implements IRouting {
 		msg.sequenceNumber = ++this.seqID;
 		
 		SimpleMessageTimer messageTimer = new SimpleMessageTimer(msg);
-		messageTimer.startRelative(1, node);
+		messageTimer.startRelative(2, node);
 		controlColor();
 		
 	}

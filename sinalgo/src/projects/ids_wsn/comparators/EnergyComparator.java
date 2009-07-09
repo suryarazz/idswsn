@@ -4,8 +4,6 @@ import java.util.Comparator;
 
 import projects.ids_wsn.enumerators.Order;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
-import projects.ids_wsn.nodeDefinitions.routing.fuzzy.RoutingField;
-import sinalgo.nodes.Node;
 
 /**
  * Comparar em ordem crescente ou decrescente

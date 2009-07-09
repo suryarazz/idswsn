@@ -200,8 +200,14 @@
 <Monitor>
 	<Inference>
 		<NumberOfPackets value="10" />
-		<InternalBuffer value="5" />
+		<InternalBuffer value="30" />
 	</Inference>
+	<Rules>
+		<Interval>
+			<Min value="2" />
+			<Max value="4" />
+		</Interval>
+	</Rules>
 </Monitor>
 
 <Attack>
@@ -210,7 +216,7 @@
 	</Repetition>
 	<Exhaustion>
 		<Quantity value="10" />
-		<Timer value="2" />
+		<Timer value="1" />
 	</Exhaustion>
 </Attack>
 
