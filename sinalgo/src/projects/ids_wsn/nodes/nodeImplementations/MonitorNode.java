@@ -2,7 +2,9 @@ package projects.ids_wsn.nodes.nodeImplementations;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.Monitor.DataMessage;
@@ -30,13 +32,18 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	private List<Node> listLocalIntervalNodes;
 	
 	private Integer internalBuffer;
+	
+	private Map<Rules, List<Node>> mapLocalMaliciousNodes;
 
+	private Map<Rules, List<Node>> mapExternalMaliciousNode;
+	
 	public void doInference() {
 				
 	}
 	
 	@Override
 	public void init() {
+		mapLocalMaliciousNodes = new HashMap<Rules, List<Node>>();
 		setMyColor(Color.RED);
 		super.init();
 		listDataMessages = new ArrayList<DataMessage>();
@@ -119,14 +126,11 @@ public class MonitorNode extends BasicNode implements IMonitor {
 		return listLocalIntervalNodes;
 	}
 	
+	public Map<Rules, List<Node>> getMapLocalMaliciousNodes() {
+		return mapLocalMaliciousNodes;
+	}
+	
 	public void setLocalMaliciousList(Rules rule, List<Node> lista) {
-		switch (rule) {
-			case REPETITION:
-				setListLocalRepetitionNodes(lista);						
-				break;
-			case INTERVAL:
-				setListLocalIntervalNodes(lista);
-				break;
-		}
+		mapLocalMaliciousNodes.put(rule,lista);
 	}
 }
