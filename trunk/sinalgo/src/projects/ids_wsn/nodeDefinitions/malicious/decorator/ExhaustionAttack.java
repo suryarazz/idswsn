@@ -1,12 +1,6 @@
 package projects.ids_wsn.nodeDefinitions.malicious.decorator;
-
-import java.util.Random;
-
 import projects.ids_wsn.nodeDefinitions.malicious.IAttack;
-import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.nodeImplementations.ExhaustionNode;
-import projects.ids_wsn.nodes.nodeImplementations.MaliciousNode;
-import projects.ids_wsn.nodes.timers.RepetitionTimer;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.Node;
