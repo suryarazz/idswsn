@@ -193,6 +193,11 @@ public abstract class BasicNode extends Node{
 		routing.printRoutingTable();		
 	}
 	
+	@NodePopupMethod(menuText="Print Radio Intensity")
+	public void printRadioIntensity(){
+		Tools.appendToOutput("R.I: "+this.getRadioIntensity()+"\n");
+	}
+	
 	
 	/**
 	 * This method is called before the Inbox iterator
