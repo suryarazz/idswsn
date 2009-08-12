@@ -27,6 +27,10 @@ public class RulesDecorator implements IMonitor {
 	public void setLocalMaliciousList(Rules rule, List<Node> lista) {
 		monitor.setLocalMaliciousList(rule, lista);		
 	}
+
+	public Integer getMonitorID() {
+		return monitor.getMonitorID();
+	}
 	
 	
 
