@@ -133,4 +133,8 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	public void setLocalMaliciousList(Rules rule, List<Node> lista) {
 		mapLocalMaliciousNodes.put(rule,lista);
 	}
+
+	public Integer getMonitorID() {
+		return this.ID;
+	}
 }
