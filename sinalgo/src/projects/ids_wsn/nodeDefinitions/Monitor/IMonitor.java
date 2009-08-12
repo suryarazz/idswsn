@@ -8,4 +8,5 @@ public interface IMonitor {
 	public void doInference();
 	public List<DataMessage> getDataMessage();
 	public void setLocalMaliciousList(Rules rule, List<Node> lista);
+	public Integer getMonitorID();
 }
