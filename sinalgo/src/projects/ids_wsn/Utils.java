@@ -142,4 +142,18 @@ public class Utils {
 		
 		return result;
 	}
+	
+	public static Boolean isMultiPathBalanced(){
+		Boolean balanced = Boolean.FALSE;
+		try {
+			String multiPathBalanced = Configuration.getStringParameter("NetworkLayer/MultiPathBalanced");
+			if (multiPathBalanced.equals("yes")){
+				balanced = Boolean.TRUE;				
+			}
+		} catch (CorruptConfigurationEntryException e) {
+			Tools.appendToOutput("Key NetworkLayer/MultiPathBalanced not found");
+			e.printStackTrace();
+		}
+		return balanced;
+	}
 }

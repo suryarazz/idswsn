@@ -28,4 +28,18 @@
              -overwrite dimX=700 dimY=700 
              			NetworkLayer/UseFuzzyRouting=no 
              			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
-             			SimulationName=rede100nosSemFuzzy         
+             			SimulationName=rede100nosSemFuzzy    
+             			
+ 3) Multi-Path Balanceado
+ -project ids_wsn -gen 4 ids_wsn:BaseStation PositionFile (/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/src/projects/ids_wsn/4basestation.pos) 
+             -gen 100 ids_wsn:NormalNode PositionFile (/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/src/projects/ids_wsn/100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/src/projects/ids_wsn/30simpleevents.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=yes
+             		    NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting
+             		    NetworkLayer/MultiPathBalanced=yes
+                        SimulationName=rede100nosComFuzzy   
+                        
+                        --- Utilizar nó 15 
+                        --- quando for testar o roteamento com fuzzy, configurar a estação base
+                        para utilizar o tempo 700 para retransmitir a mensagem de sinalização 
