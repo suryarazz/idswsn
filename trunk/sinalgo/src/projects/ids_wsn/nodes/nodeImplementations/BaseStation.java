@@ -119,7 +119,14 @@ public class BaseStation extends Node {
 	
 	@NodePopupMethod(menuText="Build routing tree - Fuzzy")
 	public void sendMessageFuzzyTo(){	
-		BaseStationRepeatMessageTimer t = new BaseStationRepeatMessageTimer(1500);
+		BaseStationRepeatMessageTimer t = new BaseStationRepeatMessageTimer(700);
+		t.startRelative(1, this);
+		
+	}
+	
+	@NodePopupMethod(menuText="Build routing tree - Only Multi-Path")
+	public void sendMessageMultiPathWithoutFuzzyTo(){	
+		BaseStationRepeatMessageTimer t = new BaseStationRepeatMessageTimer(0);
 		t.startRelative(1, this);
 		
 	}

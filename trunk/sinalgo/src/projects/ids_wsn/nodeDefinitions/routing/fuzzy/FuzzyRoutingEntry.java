@@ -42,7 +42,7 @@ public class FuzzyRoutingEntry {
 	}
 	
 	/**
-	 * Get the route given and indice
+	 * Get the route given an indice.
 	 * Routes with lower fsl are best
 	 * 
 	 * @return

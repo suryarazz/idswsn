@@ -12,12 +12,16 @@ import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.FloodFindFuzzy;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
+import sinalgo.configuration.Configuration;
+import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
 import sinalgo.tools.logging.Logging;
 
 public class FuzzyRouting implements IRouting {
+	
+	
 	
 	//Number of entries in Routing Table
 	private Integer numBuffer = 3; 
@@ -31,10 +35,32 @@ public class FuzzyRouting implements IRouting {
 	protected Hashtable<Node, Integer> numHopsByNode = new Hashtable<Node, Integer>();
 	
 	private BasicNode node;
+	
+	private Boolean isMultiPathBalanced;
+	
+	//If multi-path os balanced, we do not have to use fuzzy inference. We have to send
+	//messages to all paths. This attribute is used to store the next path that we have to choose
+	private Integer sequenceSendMessage = 0;
+	
+	public FuzzyRouting(){
+		isMultiPathBalanced = Utils.isMultiPathBalanced();		
+	}
 
 	public Node getBestRoute(Node destino) {
 		FuzzyRoutingEntry fRout = fuzzyRoutingTable.get(destino);
 		return fRout.getFirstActiveRoute();
+	}
+	
+	public Node getNextRouteBalanced(Node destino) {
+		FuzzyRoutingEntry fRout = fuzzyRoutingTable.get(destino);
+		
+		Node n = fRout.getActiveRoute(sequenceSendMessage);
+		sequenceSendMessage++;
+		if (sequenceSendMessage>3){
+			sequenceSendMessage = 0;
+		}
+		
+		return n;
 	}
 
 	public Boolean isNodeNextHop(Node destination) {
@@ -217,9 +243,16 @@ public class FuzzyRouting implements IRouting {
 			return;
 		}
 		
+		Node nextHopToDestino;
+		
 		node.seqID++;
 		Node destino = getSinkNode();
-		Node nextHopToDestino = getBestRoute(destino);
+		
+		if (!isMultiPathBalanced){
+			nextHopToDestino = getBestRoute(destino);
+		}else{
+			nextHopToDestino = getNextRouteBalanced(destino); 			
+		}
 		
 		PayloadMsg msg = new PayloadMsg(destino, node, nextHopToDestino, node);
 		msg.value = value;

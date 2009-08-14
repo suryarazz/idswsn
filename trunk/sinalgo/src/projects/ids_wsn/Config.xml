@@ -193,6 +193,7 @@
 	<RoutingProtocolName value="projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting" />
 	<UseFuzzyRouting value="no" />
 	<NumbersOfRoutesFuzzy value="3" />
+	<MultiPathBalanced value="no"/>
 </NetworkLayer>
 
 <SimulationName value="redeNormal"/>

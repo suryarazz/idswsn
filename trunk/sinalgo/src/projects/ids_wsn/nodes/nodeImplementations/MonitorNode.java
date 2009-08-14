@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.Monitor.DataMessage;
@@ -37,6 +38,10 @@ public class MonitorNode extends BasicNode implements IMonitor {
 
 	private Map<Rules, List<Node>> mapExternalMaliciousNode;
 	
+	private Integer hashLength = 1024;
+	
+	private Integer hashChain[] = new Integer[hashLength];
+	
 	public void doInference() {
 				
 	}
@@ -53,6 +58,7 @@ public class MonitorNode extends BasicNode implements IMonitor {
 			Tools.appendToOutput("Key Monitor/Inference/InternalBuffer not found");
 			e.printStackTrace();
 		}
+		initHashChain();
 		
 	}
 	
@@ -136,5 +142,12 @@ public class MonitorNode extends BasicNode implements IMonitor {
 
 	public Integer getMonitorID() {
 		return this.ID;
+	}
+	
+	private void initHashChain(){
+		Random rnd = Tools.getRandomNumberGenerator();
+		for (int i = 0; i<hashLength; i++){
+			hashChain[i] = rnd.nextInt();
+		}
 	}
 }
