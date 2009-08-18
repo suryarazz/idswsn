@@ -1,5 +1,8 @@
 package projects.ids_wsn.nodes.messages;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 
@@ -67,6 +70,12 @@ public class FloodFindFuzzy extends Message {
 	public float energy;
 	
 	/**
+	 * The list of Nodes that the sender users as routes. We will use this to avoid that a node A uses, as route, a node B 
+	 * that already uses A as route 
+	 */
+	public List<Integer> idNodesRoutes;
+	
+	/**
 	 * Default constructor. 
 	 */
 	public FloodFindFuzzy(int seqID, Node baseStation, Node immediateSource, Node forwardingNode, Node source, Integer index, Node dst, int broadcastID) {
@@ -80,6 +89,7 @@ public class FloodFindFuzzy extends Message {
 		this.index = index;
 		this.broadcastID = broadcastID;
 		this.immediateDestination = dst;
+		this.idNodesRoutes = new ArrayList<Integer>();
 	}
 	
 	@Override
@@ -89,6 +99,7 @@ public class FloodFindFuzzy extends Message {
 		msg.hopsToBaseStation = this.hopsToBaseStation;
 		msg.forwardingNode = this.forwardingNode;
 		msg.energy = this.energy;
+		msg.idNodesRoutes = this.idNodesRoutes;
 		return msg;
 	}
 	

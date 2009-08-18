@@ -3,6 +3,9 @@ package projects.ids_wsn.nodeDefinitions.routing.fuzzy;
 import java.awt.Color;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Random;
+
 import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
@@ -12,8 +15,6 @@ import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.FloodFindFuzzy;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import projects.ids_wsn.nodes.timers.SimpleMessageTimer;
-import sinalgo.configuration.Configuration;
-import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
@@ -56,7 +57,7 @@ public class FuzzyRouting implements IRouting {
 		
 		Node n = fRout.getActiveRoute(sequenceSendMessage);
 		sequenceSendMessage++;
-		if (sequenceSendMessage>3){
+		if (sequenceSendMessage>(fRout.getFieldsSize()-1)){
 			sequenceSendMessage = 0;
 		}
 		
@@ -164,7 +165,14 @@ public class FuzzyRouting implements IRouting {
 		}else if (payloadMessage.nextHop.equals(node)){
 	
 			fre = fuzzyRoutingTable.get(payloadMessage.baseStation);
-			payloadMessage.nextHop = fre.getFirstActiveRoute();
+			
+			if (!isMultiPathBalanced){
+				payloadMessage.nextHop = fre.getFirstActiveRoute();
+			}else{
+				payloadMessage.nextHop = getNextRouteBalanced(payloadMessage.baseStation);
+			}
+			
+			
 			payloadMessage.immediateSource = payloadMessage.imediateSender;
 			
 			if (payloadMessage.nextHop.equals(payloadMessage.immediateSource)){
@@ -296,7 +304,7 @@ public class FuzzyRouting implements IRouting {
 		FuzzyRoutingEntry re = fuzzyRoutingTable.get(floodMsg.baseStation);
 		
 		if (floodMsg.immediateDestination != null){
-			if (floodMsg.immediateDestination.equals(node)){ //It is a message sent by the Base Station to its neighbor
+			if (floodMsg.immediateDestination.equals(node)){ //It is a message sent by the Base Station to its neighbors
 				if (re == null){
 					fsl = Utils.calculateFsl(energy, numHops);
 					fuzzyRoutingTable.put(floodMsg.baseStation, new FuzzyRoutingEntry(Integer.valueOf(floodMsg.sequenceID), Integer.valueOf(floodMsg.hopsToBaseStation), (Node)floodMsg.forwardingNode, Boolean.TRUE, fsl, floodMsg.index));
@@ -305,10 +313,12 @@ public class FuzzyRouting implements IRouting {
 			}else{
 				forward = Boolean.FALSE;
 			}
-		}else{	
+		}else{			
 			if (floodMsg.forwardingNode.equals(node)){ // The message bounced back. The node must discard the msg.
 				forward = Boolean.FALSE;
 			}else if(floodMsg.immediateSource.equals(node)){ // The forwarding node is retransmiting a message that the node have just transmitted.
+				forward = Boolean.FALSE;
+			}else if (floodMsg.idNodesRoutes.contains(node.ID)){ // We will use this to avoid that a node A uses, as route, a node B that already uses A as route
 				forward = Boolean.FALSE;
 			}
 			else if (Utils.isNeighboringNode(node, floodMsg.baseStation)){ //If the node is neighbor from Sink Node, do nothing
@@ -349,11 +359,16 @@ public class FuzzyRouting implements IRouting {
 				copy.energy = node.getBateria().getEnergy();				
 			}
 			
+			//We have to store all nexts hops that the node has.
+			List<Integer> listNextHops = fuzzyRoutingTable.get(copy.baseStation).getAllNextHops();
+			
+			
 			copy.immediateSource = copy.forwardingNode;
 			copy.forwardingNode = node;
 			copy.ttl--;
 			copy.hopsToBaseStation++;
 			copy.immediateDestination = null;
+			copy.idNodesRoutes = listNextHops;
 			sendBroadcast(copy);
 		}		
 	}

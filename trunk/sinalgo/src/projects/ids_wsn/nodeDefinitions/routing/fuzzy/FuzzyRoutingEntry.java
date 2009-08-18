@@ -7,7 +7,6 @@ import java.util.List;
 import projects.ids_wsn.comparators.FslComparator;
 import projects.ids_wsn.enumerators.Order;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
-import projects.ids_wsn.nodes.nodeImplementations.BaseStation;
 import sinalgo.nodes.Node;
 
 public class FuzzyRoutingEntry {
@@ -181,6 +180,20 @@ public class FuzzyRoutingEntry {
 		RoutingField result = null;
 		
 		result = fields.get(0);
+		
+		return result;
+	}
+	
+	/**
+	 * Returns all next hops
+	 * @return all nexts hops
+	 */
+	public List<Integer> getAllNextHops(){
+		List<Integer> result = new ArrayList<Integer>();
+			
+		for (RoutingField f : fields){
+			result.add(f.getNextHop().ID);
+		}
 		
 		return result;
 	}
