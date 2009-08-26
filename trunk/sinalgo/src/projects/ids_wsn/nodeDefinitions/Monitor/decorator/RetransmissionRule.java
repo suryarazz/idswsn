@@ -6,7 +6,6 @@ public class RetransmissionRule extends RulesDecorator {
 
 	public RetransmissionRule(IMonitor monitor) {
 		super(monitor);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
