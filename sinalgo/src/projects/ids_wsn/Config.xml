@@ -211,7 +211,7 @@
 	</Rules>
 	<Chord>
 		<Ring>
-			<Size value="4" />
+			<Size value="6" />
 		</Ring>
 	</Chord>
 </Monitor>
