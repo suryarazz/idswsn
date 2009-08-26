@@ -191,7 +191,7 @@
 <NetworkLayer>
 	<!-- Routing protocol used in simulations -->
 	<RoutingProtocolName value="projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting" />
-	<UseFuzzyRouting value="no" />
+	<UseFuzzyRouting value="yes" />
 	<NumbersOfRoutesFuzzy value="3" />
 	<MultiPathBalanced value="no"/>
 </NetworkLayer>
@@ -209,6 +209,11 @@
 			<Max value="4" />
 		</Interval>
 	</Rules>
+	<Chord>
+		<Ring>
+			<Size value="4" />
+		</Ring>
+	</Chord>
 </Monitor>
 
 <Attack>
