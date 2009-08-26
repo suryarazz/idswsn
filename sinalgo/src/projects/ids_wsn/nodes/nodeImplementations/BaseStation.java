@@ -5,9 +5,12 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import projects.ids_wsn.comparators.EnergyComparator;
+import projects.ids_wsn.enumerators.ChordMessageType;
 import projects.ids_wsn.enumerators.Order;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
+import projects.ids_wsn.nodeDefinitions.chord.UtilsChord;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.FloodFindFuzzy;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
@@ -40,13 +43,18 @@ public class BaseStation extends Node {
 	
 	private Boolean printReceivedMessage =  Boolean.FALSE;
 	
+	private List<MonitorNode> monitorNodes;
+	
 	public Boolean getIsRouteBuild() {
 		return isRouteBuild;
 	}
 
+	public Integer getNumberOfRoutes() {
+		return numberOfRoutes;
+	}
+	
 	@Override
 	public void checkRequirements() throws WrongConfigurationException {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -58,17 +66,26 @@ public class BaseStation extends Node {
 			if (message instanceof PayloadMsg){
 				PayloadMsg payloadMessage = (PayloadMsg) message;
 				if ((payloadMessage.nextHop == null) ||
-						(payloadMessage.nextHop.equals(this))){
-						countReceivedMessages++;
-						controlColor();		
-						if (printReceivedMessage){
-							Tools.appendToOutput("ID: "+payloadMessage.sender.ID+" /Msg: "+payloadMessage.sequenceNumber+" /Timer: "+Tools.getGlobalTime()+"\n");
+					(payloadMessage.nextHop.equals(this))){
+					countReceivedMessages++;
+					
+					if (payloadMessage.value.equals(ChordMessageType.ANSWER_MONITOR_ID.getValue())){
+						Boolean addNewNode = this.addMonitorNode((MonitorNode) payloadMessage.sender);
+						if(addNewNode && this.monitorNodes.size() >= UtilsChord.getMonitorNodes().size()){
+							monitorNodes = UtilsChord.createMonitorsRing(this.getMonitorNodes());
+							
+							UtilsChord.createFingerTables(monitorNodes);
 						}
+					}
+					
+					controlColor();	
+					if (printReceivedMessage){
+						Tools.appendToOutput("ID: "+payloadMessage.sender.ID+" /Msg: "+payloadMessage.sequenceNumber+" /Timer: "+Tools.getGlobalTime()+"\n");
+					}
 				}
 			}
 		}
 	}
-	
 	
 	@NodePopupMethod(menuText="Enable/Disable the printing of received messages")
 	public void enableDisableImpMsg(){
@@ -88,7 +105,7 @@ public class BaseStation extends Node {
 	@Override
 	public void init() {
 		this.countReceivedMessages = 0;
-		
+		this.monitorNodes = new ArrayList<MonitorNode>();
 		try {
 			//Here, we have to get the Number of Routes Value from Config.xml and inject into numberOfRoutes attribute
 			String number = Configuration.getStringParameter("NetworkLayer/NumbersOfRoutesFuzzy");
@@ -100,7 +117,9 @@ public class BaseStation extends Node {
 	}
 
 	@Override
-	public void neighborhoodChange() {}
+	public void neighborhoodChange() {
+		sendMessageTo();
+	}
 
 	@Override
 	public void postStep() {}
@@ -193,5 +212,30 @@ public class BaseStation extends Node {
 		return listNodes;
 	}
 	
+	public Boolean addMonitorNode(MonitorNode monitorNode){
+		for (MonitorNode monitor : monitorNodes) {
+			if (monitor.equals(monitorNode)) {
+				return Boolean.FALSE;
+			}
+		}
+		this.monitorNodes.add(monitorNode);
+		return Boolean.TRUE;
+	}
+	
+	public Boolean isMonitorListFull(){
+		return monitorNodes.size() >= UtilsChord.getMonitorNodes().size();
+	}
 
+	public List<MonitorNode> getMonitorNodes() {
+		return monitorNodes;
+	}
+	
+	@NodePopupMethod(menuText="Print qtde. monitors")
+	public void printMonitorNodesQuantity(){
+		Tools.appendToOutput("Total: " + monitorNodes.size());
+		for (MonitorNode monitorNode : monitorNodes) {
+			Tools.appendToOutput("\nnó "+ monitorNode.ID + " (hash: " + monitorNode.getHashID() + ")");
+		}
+	}
 }
+
