@@ -42,11 +42,11 @@ public abstract class BasicNode extends Node{
 	private Boolean isDead = Boolean.FALSE;
 	private Boolean useFuzzyRouting = Boolean.FALSE;
 	
+	public Integer chordSequenceID;
 		
 
 	@Override
 	public void checkRequirements() throws WrongConfigurationException {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -69,7 +69,7 @@ public abstract class BasicNode extends Node{
 			this.bateria.spend(EnergyMode.RECEIVE);
 			
 				preProcessingMessage(message);
-			
+				
 			routing.receiveMessage(message);
 			
 				postProcessingMessage(message);
@@ -82,14 +82,14 @@ public abstract class BasicNode extends Node{
 	@Override
 	public void init() {
 		this.setColor(getMyColor());
-		
+		this.chordSequenceID = 0;
 		try {
 			//Here, we have to get the routing protocol from Config.xml and inject into routing attribute
 			String routingProtocol = Configuration.getStringParameter("NetworkLayer/RoutingProtocolName");
 			routing = Utils.StringToRoutingProtocol(routingProtocol);
 			routing.setNode(this);
 		} catch (CorruptConfigurationEntryException e) {
-			Tools.appendToOutput("Chave do protocolo de roteamento n√£o foi encontrado");
+			Tools.appendToOutput("Chave do protocolo de roteamento n„o foi encontrado");
 			e.printStackTrace();
 		}
 		
@@ -120,13 +120,11 @@ public abstract class BasicNode extends Node{
 
 	@Override
 	public void neighborhoodChange() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void postStep() {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -167,7 +165,11 @@ public abstract class BasicNode extends Node{
 	
 	@NodePopupMethod(menuText="Send a message to the Base Station")
 	public void sendMessageToBaseStation(){
-		routing.sendMessage(10);
+		this.sendMessageToBaseStation(10);
+	}
+	
+	public void sendMessageToBaseStation(Integer value){
+		routing.sendMessage(value);
 	}
 	
 	@NodePopupMethod(menuText="Send continuously a message to the Base Station per Round")
