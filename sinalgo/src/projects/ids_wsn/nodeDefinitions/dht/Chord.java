@@ -1,6 +1,7 @@
 package projects.ids_wsn.nodeDefinitions.dht;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +11,36 @@ import projects.ids_wsn.nodeDefinitions.Monitor.Rules;
 import projects.ids_wsn.nodeDefinitions.chord.UtilsChord;
 import projects.ids_wsn.nodes.nodeImplementations.FingerEntry;
 import projects.ids_wsn.nodes.nodeImplementations.MonitorNode;
-import sinalgo.nodes.Node;
+import sinalgo.configuration.Configuration;
+import sinalgo.configuration.CorruptConfigurationEntryException;
+import sinalgo.tools.Tools;
 
 public class Chord implements IDHT {
+	
+	/**
+	 * When this buffer is full, the signatures must be analyzed 
+	 * and the supervisor must subscribe the malicious nodes to the other monitors
+	 */
+	public static Integer SIGNATURES_BUFFER;
+	
+	static {
+		try {
+			SIGNATURES_BUFFER = Configuration.getIntegerParameter("Monitor/Inference/SignaturesBuffer");
+		} catch (CorruptConfigurationEntryException e) {
+			Tools.appendToOutput("Key Monitor/Inference/SignaturesBuffer not found");
+			e.printStackTrace();
+		}
+	}
 
+	/**
+	 * Monitor node which this class references
+	 */
 	private MonitorNode monitor;
+
+	/**
+	 * Stores the SHA-1 Hash ID of the node monitor node
+	 */
+	private Integer hashID;
 	
 	/**
 	 * Rules which the monitor(supervisor) is responsible for.
@@ -44,16 +70,14 @@ public class Chord implements IDHT {
 	 * the lists of malicious nodes received from the
 	 * <code>mapLocalMaliciousNodes</code> of other monitor nodes.
 	 */
-	private Map<Rules, List<Node>> mapExternalMaliciousNode;
+	private Map<Rules, Set<Signature>> mapExternalSignatures;
 
 	public Chord(MonitorNode monitor) {
 		this.monitor = monitor;
+		this.hashID = UtilsChord.generateSHA1(this.monitor.ID);
+		this.mapExternalSignatures = new HashMap<Rules, Set<Signature>>();
 		supervisedRules = new HashSet<Rules>();
 		fingerTable = new ArrayList<FingerEntry>();
-	}
-	
-	public void updateFingerTable() {
-		//TODO implement updateFingerTable when a node joins or extis the network
 	}
 	
 	public void createFingerTable(){
@@ -153,24 +177,42 @@ public class Chord implements IDHT {
 		this.fingerTable = fingerTable;
 	}
 
-	public void setMapExternalMaliciousNode(
-			Map<Rules, List<Node>> mapExternalMaliciousNode) {
-		this.mapExternalMaliciousNode = mapExternalMaliciousNode;
+	public void setMapExternalSignatures(Map<Rules, Set<Signature>> mapExternalMaliciousNode) {
+		this.mapExternalSignatures = mapExternalMaliciousNode;
 	}
 
-	public Map<Rules, List<Node>> getMapExternalMaliciousNode() {
-		return mapExternalMaliciousNode;
+	public Map<Rules, Set<Signature>> getMapExternalSignatures() {
+		return mapExternalSignatures;
 	}
 
-	public void addExternalMaliciousList(Rules rule,
-			List<Node> externalMalicious) {
-		if (mapExternalMaliciousNode.containsKey(rule)) {
-			List<Node> maliciousNodes = mapExternalMaliciousNode.get(rule);
-			externalMalicious.addAll(maliciousNodes);
+	public void addExternalSignature(Signature signature) {
+		Rules rule = signature.getRule();
+		Set<Signature> signatures; 
+		if (!mapExternalSignatures.containsKey(rule)) {
+			signatures = new HashSet<Signature>();
+		}else{
+			signatures = mapExternalSignatures.get(rule);
 		}
-		mapExternalMaliciousNode.put(rule, externalMalicious);
 		
-		//TODO se buffer estiver cheio correlacionar os nós maliciosos
+		signatures.add(signature);
+		mapExternalSignatures.put(rule, signatures);
+		
+		//check whether the buffer is full 
+		if (signatures.size() >= SIGNATURES_BUFFER) {
+			
+			this.monitor.correlate(signatures);
+			
+			//clear the buffer for the rule which is being correlated
+			mapExternalSignatures.remove(rule);
+		}
+	}
+	
+	public Set<Signature> getSignatures(Rules rule){
+		if(mapExternalSignatures.containsKey(rule)){
+			return mapExternalSignatures.get(rule);
+		}
+		
+		return null;
 	}
 
 	public void addSupervisedRules(Rules rule) {
@@ -204,4 +246,14 @@ public class Chord implements IDHT {
 	public void setPreviousNodeInChordRing(MonitorNode previousNodeInChordRing) {
 		this.previousNodeInChordRing = previousNodeInChordRing;
 	}
+
+	public Integer getHashID() {
+		return hashID;
+	}
+
+	public void setHashID(Integer hashID) {
+		this.hashID = hashID;
+	}
+	
+	
 }
