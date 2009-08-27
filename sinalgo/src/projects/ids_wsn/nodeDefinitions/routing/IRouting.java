@@ -1,6 +1,7 @@
 package projects.ids_wsn.nodeDefinitions.routing;
 
 import projects.ids_wsn.nodeDefinitions.BasicNode;
+import projects.ids_wsn.nodes.messages.PayloadMsg;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 
@@ -14,6 +15,7 @@ public interface IRouting {
 	public void setNode(BasicNode node);
 	public Node getBestRoute(Node destino);
 	public void printRoutingTable();
+	public void sendChordMessage(PayloadMsg message);
 	
 	/**
 	 * Return the sink node. 
@@ -24,11 +26,10 @@ public interface IRouting {
 	public Node getSinkNode();
 	
 	/**
-	 * This method will check wether the destination Node is the Source Node next hop or not.
+	 * This method will check weather the destination Node is the Source Node next hop or not.
 	 * 
 	 * @param destination Node
 	 * @return Boolen
 	 */
 	public Boolean isNodeNextHop(Node destination);
-
 }

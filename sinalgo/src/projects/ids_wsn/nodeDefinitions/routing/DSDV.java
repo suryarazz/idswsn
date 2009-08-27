@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+
 import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodes.messages.EventMessage;
@@ -98,7 +99,7 @@ public class DSDV implements IRouting {
 				forward = Boolean.FALSE;
 			}else {
 				Integer ind = re.nextHops.indexOf(floodMsg.forwardingNode);
-				if (re.sequenceNumber.get(ind) < floodMsg.sequenceID) { //Update an existing entrie
+				if (re.sequenceNumber.get(ind) < floodMsg.sequenceID) { //Update an existing entry
 					re.numHops.set(ind, floodMsg.hopsToBaseStation);
 					re.sequenceNumber.set(ind,floodMsg.sequenceID);
 					re.nextHops.set(ind, floodMsg.forwardingNode);							
@@ -121,7 +122,6 @@ public class DSDV implements IRouting {
 	private void receivePayloadMessage(PayloadMsg payloadMessage) {
 		MultiRoutingEntry re = null;
 		
-		
 		if (payloadMessage.nextHop == null ){ //It's a broadcast
 			if (payloadMessage.ttl > 1) {
 				Boolean forward = Boolean.TRUE;
@@ -133,7 +133,6 @@ public class DSDV implements IRouting {
 				}
 				if (forward){
 					sendBroadcast(payloadMessage);
-				
 				}
 			}
 		}else if (payloadMessage.nextHop.equals(node)){
@@ -151,7 +150,7 @@ public class DSDV implements IRouting {
 	private void checkEnergyLevel() {
 		Logging deadLog = Utils.getDeadNodesLog();
 		Float energy = node.getBateria().getEnergy();
-		Boolean sendBeacon = Boolean.FALSE;
+//		Boolean sendBeacon = Boolean.FALSE;
 		
 		if (energy.intValue() > node.energy60.intValue() && energy.intValue() < node.energy70.intValue()){
 			node.setMyColor(Color.MAGENTA);
@@ -166,7 +165,7 @@ public class DSDV implements IRouting {
 			node.setMyColor(Color.LIGHT_GRAY);
 			node.setColor(Color.LIGHT_GRAY);
 			if (!node.send60){
-				sendBeacon = Boolean.TRUE;
+//				sendBeacon = Boolean.TRUE;
 				node.send60 = Boolean.TRUE;
 			}
 		}
@@ -175,7 +174,7 @@ public class DSDV implements IRouting {
 			node.setMyColor(Color.GRAY);
 			node.setColor(Color.GRAY);
 			if (!node.send50){
-				sendBeacon = Boolean.TRUE;
+//				sendBeacon = Boolean.TRUE;
 				node.send50 = Boolean.TRUE;
 			}
 		}
@@ -247,9 +246,31 @@ public class DSDV implements IRouting {
 		controlColor();
 		
 	}
+	
+	public void sendChordMessage(PayloadMsg message){
+		
+		if (node.getIsDead()){
+			return;
+		}
+		
+		node.seqID++;
+		Node destino = getSinkNode();
+		Node nextHopToDestino = getBestRoute(destino);
+		
+		message.baseStation = destino;
+		message.sender = node;
+		message.nextHop = nextHopToDestino;
+		message.immediateSource = node;
+		message.sequenceNumber = ++this.seqID;
+		
+		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
+		messageTimer.startRelative(2, node);
+		controlColor();
+		
+		
+	}
 
 	public void printRoutingTable() {
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -293,5 +314,4 @@ public class DSDV implements IRouting {
 		controlColor();
 		
 	}
-
 }
