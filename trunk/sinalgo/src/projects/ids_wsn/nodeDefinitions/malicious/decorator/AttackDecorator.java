@@ -13,7 +13,7 @@ public class AttackDecorator implements IAttack  {
 	}
 
 	public void doAttack(Node node, Message message) {
-		//attack.doAttack(node,message);
+		attack.doAttack(node,message);
 
 	}
 
