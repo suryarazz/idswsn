@@ -71,13 +71,17 @@ public class BaseStation extends Node {
 					
 					if (payloadMessage.value.equals(ChordMessageType.ANSWER_MONITOR_ID.getValue())){
 						Boolean addNewNode = this.addMonitorNode((MonitorNode) payloadMessage.sender);
-						if(addNewNode && this.monitorNodes.size() >= UtilsChord.getMonitorNodes().size()){
-							monitorNodes = UtilsChord.createMonitorsRing(this.getMonitorNodes());
-							
+						if(addNewNode && this.monitorNodes.size() >= UtilsChord.getAliveMonitorNodes().size()){
 							UtilsChord.createFingerTables(monitorNodes);
 						}
 					}
 					
+					if (payloadMessage.value.equals(ChordMessageType.SUPERVISOR_DOWN.getValue())){
+						monitorNodes = UtilsChord.getAliveMonitorNodes();
+						
+						UtilsChord.createFingerTables(monitorNodes);
+					}
+				
 					controlColor();	
 					if (printReceivedMessage){
 						Tools.appendToOutput("ID: "+payloadMessage.sender.ID+" /Msg: "+payloadMessage.sequenceNumber+" /Timer: "+Tools.getGlobalTime()+"\n");
@@ -223,7 +227,7 @@ public class BaseStation extends Node {
 	}
 	
 	public Boolean isMonitorListFull(){
-		return monitorNodes.size() >= UtilsChord.getMonitorNodes().size();
+		return monitorNodes.size() >= UtilsChord.getAliveMonitorNodes().size();
 	}
 
 	public List<MonitorNode> getMonitorNodes() {
@@ -236,6 +240,13 @@ public class BaseStation extends Node {
 		for (MonitorNode monitorNode : monitorNodes) {
 			Tools.appendToOutput("\nnó "+ monitorNode.ID + " (hash: " + monitorNode.getHashID() + ")");
 		}
+	}
+	
+	@NodePopupMethod(menuText="Create new Finger Tables")
+	public void createFingerTableDueToNewNodes(){
+		monitorNodes = UtilsChord.getAliveMonitorNodes();
+		
+		UtilsChord.createFingerTables(monitorNodes);
 	}
 }
 

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import projects.ids_wsn.enumerators.ChordMessageType;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
@@ -18,14 +19,19 @@ import projects.ids_wsn.nodeDefinitions.Monitor.decorator.RetransmissionRule;
 import projects.ids_wsn.nodeDefinitions.chord.UtilsChord;
 import projects.ids_wsn.nodeDefinitions.dht.Chord;
 import projects.ids_wsn.nodeDefinitions.dht.IDHT;
+import projects.ids_wsn.nodeDefinitions.dht.Signature;
+import projects.ids_wsn.nodes.messages.ChordMessage;
 import projects.ids_wsn.nodes.messages.FloodFindDsdv;
 import projects.ids_wsn.nodes.messages.FloodFindFuzzy;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
+import sinalgo.nodes.Connections;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.edges.Edge;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
+import sinalgo.tools.storage.ReusableListIterator;
 
 /**
  * Node responsible for monitoring your neighbors through the promiscuous
@@ -39,10 +45,6 @@ import sinalgo.tools.Tools;
  */
 public class MonitorNode extends BasicNode implements IMonitor {
 
-	/**
-	 * Stores the SHA-1 Hash ID of the node
-	 */
-	private Integer hashID;
 	/**
 	 * It stores the internal messages buffer size (<code>dataMessages</code>).
 	 */
@@ -83,7 +85,6 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	public void init() {
 		setMyColor(Color.RED);
 		super.init();
-		this.hashID = UtilsChord.generateSHA1(this.ID);
 		this.dht = new Chord(this);
 		mapLocalMaliciousNodes = new HashMap<Rules, List<Node>>();
 		dataMessages = new ArrayList<DataMessage>();
@@ -92,17 +93,16 @@ public class MonitorNode extends BasicNode implements IMonitor {
 
 	@Override
 	protected void preProcessingMessage(Message message) {
+
+	}
+
+	@Override
+	public Boolean beforeSendingMessage(Message message) {
 		if (message instanceof PayloadMsg) {
 			PayloadMsg msg = (PayloadMsg) message;
 			addMessageToList(msg);
 		}
-	}
-	
-	@Override
-	protected void postProcessingMessage(Message message) {
-		if(message instanceof FloodFindDsdv || message instanceof FloodFindFuzzy){
-			this.sendMessageToBaseStation(ChordMessageType.ANSWER_MONITOR_ID.getValue());
-		}
+		return Boolean.TRUE;
 	}
 	
 	private void addMessageToList(PayloadMsg msg) {
@@ -123,17 +123,6 @@ public class MonitorNode extends BasicNode implements IMonitor {
 		}
 	}
 
-	@Override
-	public Boolean beforeSendingMessage(Message message) {
-		if (message instanceof PayloadMsg) {
-			PayloadMsg msg = (PayloadMsg) message;
-			addMessageToList(msg);
-		}
-		return Boolean.TRUE;
-	}
-	
-	
-
 	private void applyRules() {
 		IMonitor rule1 = new RepetitionRule(this);
 		IMonitor rule2 = new RetransmissionRule(rule1);
@@ -143,39 +132,86 @@ public class MonitorNode extends BasicNode implements IMonitor {
 		this.sendMaliciousNodesToSupervisor();
 	}
 
-	@SuppressWarnings("unused")
 	private void sendMaliciousNodesToSupervisor() {
-
 		for (Rules rule : mapLocalMaliciousNodes.keySet()) {
+
 
 			Integer hashKey = UtilsChord.generateSHA1(rule.name());
 			MonitorNode sucessorNode = this.getDht().findSucessor(hashKey);
 
-			// TODO enviar os maliciosos para o supervisor ou é melhor enviar as
-			// mensagens??
+			System.out.println("node" + this.ID + "(hash: " + this.getHashID() + ")" + " is sending malicious for rule: " + rule.name() + 
+					" hash(" +hashKey + ") for supervisor " + sucessorNode.ID + " hash(" + sucessorNode.getHashID() + ")" );
 
 			List<Node> maliciousNodes = mapLocalMaliciousNodes.get(rule);
-
-			// TODO usar o protocolo de roteamento para enviar a lista de nós
-
-			// TODO criar classe de assinatura para armazenar a lista de
-			// maliciosos e o no que enviou essa lista, etc...
-			// Substituir mapExternalMaliciousList por um mapa de assinaturas
-
-//			sucessorNode.addExternalMaliciousList(rule, maliciousNodes);
+			
+			PayloadMsg payloadMsg = new PayloadMsg();
+			
+			Signature signature = new Signature(this, maliciousNodes, rule, sucessorNode);
+			
+			payloadMsg.value = ChordMessageType.SEND_TO_SUPERVISOR.getValue();
+			payloadMsg.setSignature(signature);
+			
+			this.getRouting().sendChordMessage(payloadMsg);
 		}
+		//all the malicious nodes were sent to supervisor, they don't need to be kept here anymore
+		this.mapLocalMaliciousNodes.clear();
 	}
 	
 	public void doInference() {
 		
 	}
+	
+	public void correlate(Set<Signature> signatures) {
+		// TODO Pegar método de correlacionar no projeto antigo do marvin
+	}
+	
 	public void addLocalMaliciousList(Rules rule, List<Node> lista) {
 		mapLocalMaliciousNodes.put(rule, lista);
 	}
 	
+	@Override
+	protected void postProcessingMessage(Message message) {
+		super.postProcessingMessage(message);
+		
+		if(message instanceof FloodFindDsdv || message instanceof FloodFindFuzzy){
+			this.sendMessageToBaseStation(ChordMessageType.ANSWER_MONITOR_ID.getValue());
+		}
+		
+		if (message instanceof PayloadMsg) {
+			PayloadMsg payloadMsg = (PayloadMsg) message;
+			if (payloadMsg.value == ChordMessageType.SEND_TO_SUPERVISOR.getValue()) {
+				
+				Signature signature = payloadMsg.getSignature();
+				
+				if (signature.getSupervisor().equals(this)) {//this node is a supervisor
+					this.notifyNeighbors();// notify neighbors that this node is a supervisor
+					this.getDht().addExternalSignature(signature);
+				}
+			}
+		}
+	}
+
+	private void notifyNeighbors() {
+		ChordMessage chordMessage = new ChordMessage();
+		chordMessage.setSender(this);
+		chordMessage.setChordMessageType(ChordMessageType.NOTIFY_NEIGHBORS);
+		
+		Edge edge;
+		Node neighbour;
+		Connections conn = this.outgoingConnections;
+		ReusableListIterator<Edge> listConn = conn.iterator();
+		
+		while (listConn.hasNext()){
+			edge = listConn.next();
+			neighbour = edge.endNode;
+			neighbour.send(chordMessage, neighbour);
+		}
+		
+	}
+
 	@NodePopupMethod(menuText="Print Finger Table")
 	public void printFingerTable(){
-		Tools.appendToOutput("\nnode: " + this.ID + " ( "+ this.hashID +" )");
+		Tools.appendToOutput("\n\nnode: " + this.ID + " ( "+ this.getHashID() +" )");
 		
 		List<FingerEntry> fingerTable = this.getDht().getFingerTable();
 		for (FingerEntry fingerEntry : fingerTable) {
@@ -185,7 +221,7 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	
 	@NodePopupMethod(menuText="Print Ring Information")
 	public void printRingInfomation(){
-		Tools.appendToOutput("\nnode: " + this.ID + " ( "+ this.hashID +" )");
+		Tools.appendToOutput("\nnode: " + this.ID + " ( "+ this.getHashID() +" )");
 		
 		Tools.appendToOutput("\nnext: "+this.getDht().getNextNodeInChordRing().ID+" (hash: " + this.getDht().getNextNodeInChordRing().getHashID() + ")");
 		Tools.appendToOutput("\nprevious: "+this.getDht().getPreviousNodeInChordRing().ID+" (hash: " + this.getDht().getPreviousNodeInChordRing().getHashID() + ")");
@@ -226,7 +262,7 @@ public class MonitorNode extends BasicNode implements IMonitor {
 
 	@Override
 	public List<DataMessage> getDataMessage() {
-		return null;
+		return this.dataMessages;
 	}
 
 	@Override
@@ -235,11 +271,11 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	}
 	
 	public Integer getHashID() {
-		return hashID;
+		return this.dht.getHashID();
 	}
 	
 	public void setHashID(Integer hashID) {
-		this.hashID = hashID;
+		this.getDht().setHashID(hashID);
 	}
 	
 	public IDHT getDht() {

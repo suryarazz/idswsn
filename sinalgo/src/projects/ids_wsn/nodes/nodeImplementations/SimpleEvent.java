@@ -18,13 +18,11 @@ public class SimpleEvent extends Node implements IEvent {
 
 	@Override
 	public void checkRequirements() throws WrongConfigurationException {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void handleMessages(Inbox inbox) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -35,13 +33,11 @@ public class SimpleEvent extends Node implements IEvent {
 
 	@Override
 	public void neighborhoodChange() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void postStep() {
-		// TODO Auto-generated method stub
 
 	}
 
