@@ -3,7 +3,6 @@ package projects.ids_wsn.nodeDefinitions.malicious.decorator;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodeDefinitions.malicious.IAttack;
 import projects.ids_wsn.nodes.messages.PayloadMsg;
-import projects.ids_wsn.nodes.nodeImplementations.BaseStation;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 import sinalgo.tools.Tools;
