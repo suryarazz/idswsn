@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import projects.ids_wsn.nodeDefinitions.BasicNode;
 import projects.ids_wsn.nodes.nodeImplementations.MonitorNode;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
@@ -94,13 +95,16 @@ public class UtilsChord {
 		return monitorNodes;
 	}
 
-	public static List<MonitorNode> getMonitorNodes() {
+	public static List<MonitorNode> getAliveMonitorNodes() {
 		NodeCollectionInterface nodes = Tools.getNodeList();
 		List<MonitorNode> monitorNodes = new ArrayList<MonitorNode>();
 		
 		for (Node node : nodes) {
 			if (node instanceof MonitorNode) {
-				monitorNodes.add((MonitorNode) node);
+				MonitorNode monitor = (MonitorNode) node;
+				if (!monitor.getIsDead()) {
+					monitorNodes.add((MonitorNode) node);
+				}
 			}
 		}
 		return monitorNodes;
@@ -134,11 +138,45 @@ public class UtilsChord {
 	}
 	
 	public static void createFingerTables(List<MonitorNode> monitorNodes){
+		
+		if(hasNodeWithTheSameHashID(monitorNodes)){
+			throw new RuntimeException("There are two monitor nodes with the same HASH ID." +
+						"\ntry to increase the Chord/Ring/Size in the config.xml file.");
+		}
+		
+		UtilsChord.createMonitorsRing(monitorNodes);
+		
 		System.out.println("creating figer tables for "+monitorNodes.size() + " nodes");
 		int i = 0;
 		for (MonitorNode monitorNode : monitorNodes) {
+			monitorNode.getDht().getFingerTable().clear();
 			monitorNode.getDht().createFingerTable();
 			i++;
+		}
+	}
+
+	private static boolean hasNodeWithTheSameHashID(List<MonitorNode> monitorNodes) {
+		for (MonitorNode monitor : monitorNodes) {
+			int count = 0;
+			for (MonitorNode monitorNode : monitorNodes) {
+				if (monitor.getHashID() == monitorNode.getHashID()) {
+					count++;
+				}
+			}
+			if (count > 1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void resetSupervisorsLists() {
+		NodeCollectionInterface nodes = Tools.getNodeList();
+		for (Node node : nodes) {
+			if (node instanceof BasicNode) {
+				BasicNode basicNode = (BasicNode) node;
+					basicNode.supervisors.clear();
+			}
 		}
 	}
 }
