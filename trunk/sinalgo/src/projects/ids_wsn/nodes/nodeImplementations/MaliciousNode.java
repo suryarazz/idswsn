@@ -22,12 +22,13 @@ public class MaliciousNode extends BasicNode implements IAttack {
 	
 	@Override
 	protected void postProcessingMessage(Message message) {
+		super.postProcessingMessage(message);
+		
 		IAttack attack1 = new RepetitionAttack(this);
 		attack1.doAttack(this, message);
 	}
 	
 	public void doAttack(Node node, Message message) {
-		// TODO Auto-generated method stub
 		
 	}
 	public void setCurrentAttacks(Integer currentAttacks) {

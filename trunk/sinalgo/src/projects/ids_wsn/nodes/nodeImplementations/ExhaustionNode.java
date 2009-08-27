@@ -21,9 +21,8 @@ public class ExhaustionNode extends BasicNode implements IAttack {
 		IAttack attack = new ExhaustionAttack(this);
 		attack.doAttack(this, null);
 	}
-
+	
 	public void doAttack(Node node, Message message) {
-		// TODO Auto-generated method stub
 		
 	}
 	
