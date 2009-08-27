@@ -1,5 +1,6 @@
 package projects.ids_wsn.nodes.messages;
 
+import projects.ids_wsn.nodeDefinitions.dht.Signature;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 
@@ -22,6 +23,14 @@ public class PayloadMsg extends Message {
 	 */
 	public Node immediateSource;
 	
+	/**
+	 * Stores the information about the malicious list that must be sent to a supervisor node
+	 */
+	private Signature signature; 
+	
+	public PayloadMsg(){
+		
+	}
 	
 	public PayloadMsg(Node destination, Node sender) {
 		this.baseStation = destination;
@@ -80,4 +89,11 @@ public class PayloadMsg extends Message {
 		return "Packet: Seq. Number: "+sequenceNumber+" - Sender: "+sender+" - Next hop: "+nextHop;
 	}
 
+	public Signature getSignature() {
+		return signature;
+	}
+
+	public void setSignature(Signature signature) {
+		this.signature = signature;
+	}
 }
