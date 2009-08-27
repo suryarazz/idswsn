@@ -1,15 +1,10 @@
 package projects.ids_wsn;
 
-import java.util.Hashtable;
-import java.util.Map;
-
 import net.sourceforge.jFuzzyLogic.FIS;
 import net.sourceforge.jFuzzyLogic.FunctionBlock;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.energy.simple.SimpleEnergy;
-import projects.ids_wsn.nodeDefinitions.routing.DSDV;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
-import projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting;
 import projects.ids_wsn.nodes.timers.RestoreColorTime;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
