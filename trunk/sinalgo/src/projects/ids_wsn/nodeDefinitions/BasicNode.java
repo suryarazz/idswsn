@@ -2,13 +2,19 @@ package projects.ids_wsn.nodeDefinitions;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import projects.ids_wsn.Utils;
+import projects.ids_wsn.enumerators.ChordMessageType;
 import projects.ids_wsn.nodeDefinitions.energy.EnergyMode;
 import projects.ids_wsn.nodeDefinitions.energy.IEnergy;
 import projects.ids_wsn.nodeDefinitions.routing.IRouting;
+import projects.ids_wsn.nodes.messages.ChordMessage;
+import projects.ids_wsn.nodes.nodeImplementations.MonitorNode;
+import projects.ids_wsn.nodes.timers.ChordDelayTimer;
 import projects.ids_wsn.nodes.timers.RepeatSendMessageTimer;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
@@ -42,9 +48,9 @@ public abstract class BasicNode extends Node{
 	private Boolean isDead = Boolean.FALSE;
 	private Boolean useFuzzyRouting = Boolean.FALSE;
 	
-	public Integer chordSequenceID;
 		
-
+	public Set<MonitorNode> supervisors;
+	
 	@Override
 	public void checkRequirements() throws WrongConfigurationException {
 		
@@ -82,7 +88,7 @@ public abstract class BasicNode extends Node{
 	@Override
 	public void init() {
 		this.setColor(getMyColor());
-		this.chordSequenceID = 0;
+		this.supervisors = new HashSet<MonitorNode>();
 		try {
 			//Here, we have to get the routing protocol from Config.xml and inject into routing attribute
 			String routingProtocol = Configuration.getStringParameter("NetworkLayer/RoutingProtocolName");
@@ -219,7 +225,19 @@ public abstract class BasicNode extends Node{
 	/**
 	 * This method is called after the message processing in the Inbox iterator
 	 */
-	protected void postProcessingMessage(Message message){}
+	protected void postProcessingMessage(Message message){
+		if (message instanceof ChordMessage) {
+			ChordMessage chordMessage = (ChordMessage) message;
+			if(chordMessage.getChordMessageType().equals(ChordMessageType.NOTIFY_NEIGHBORS)){
+				this.supervisors.add((MonitorNode) chordMessage.getSender());
+				
+				if (supervisors.size() == 1) {
+					ChordDelayTimer chordDelayTimer = new ChordDelayTimer();
+					chordDelayTimer.startRelative(ChordDelayTimer.DELAY_TIME, this);
+				}
+			}
+		}
+	}
 	
 	public Boolean beforeSendingMessage(Message message){ return Boolean.TRUE; }
 	public void afterSendingMessage(Message message){}
