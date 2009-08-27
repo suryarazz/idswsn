@@ -202,6 +202,7 @@
 	<Inference>
 		<NumberOfPackets value="10" />
 		<InternalBuffer value="30" />
+		<SignaturesBuffer value="3" />
 	</Inference>
 	<Rules>
 		<Interval>
@@ -211,7 +212,7 @@
 	</Rules>
 	<Chord>
 		<Ring>
-			<Size value="6" />
+			<Size value="7" />
 		</Ring>
 	</Chord>
 </Monitor>
