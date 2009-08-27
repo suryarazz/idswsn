@@ -3,8 +3,6 @@ package projects.ids_wsn.nodeDefinitions.routing.fuzzy;
 import java.awt.Color;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Random;
 
 import projects.ids_wsn.Utils;
 import projects.ids_wsn.nodeDefinitions.BasicNode;
@@ -360,7 +358,7 @@ public class FuzzyRouting implements IRouting {
 			}
 			
 			//We have to store all nexts hops that the node has.
-			List<Integer> listNextHops = fuzzyRoutingTable.get(copy.baseStation).getAllNextHops();
+//			List<Integer> listNextHops = fuzzyRoutingTable.get(copy.baseStation).getAllNextHops();
 			
 			
 			copy.immediateSource = copy.forwardingNode;
@@ -368,7 +366,7 @@ public class FuzzyRouting implements IRouting {
 			copy.ttl--;
 			copy.hopsToBaseStation++;
 			copy.immediateDestination = null;
-			copy.idNodesRoutes = listNextHops;
+//			copy.idNodesRoutes = listNextHops;
 			sendBroadcast(copy);
 		}		
 	}
@@ -536,4 +534,33 @@ public class FuzzyRouting implements IRouting {
 		controlColor();
 	}
 
+	@Override
+	public void sendChordMessage(PayloadMsg message) {
+		
+		if (node.getIsDead()){
+			return;
+		}
+		
+		Node nextHopToDestino;
+		
+		node.seqID++;
+		Node destino = getSinkNode();
+		
+		if (!isMultiPathBalanced){
+			nextHopToDestino = getBestRoute(destino);
+		}else{
+			nextHopToDestino = getNextRouteBalanced(destino); 			
+		}
+		
+		message.baseStation = destino;
+		message.sender = node;
+		message.nextHop = nextHopToDestino;
+		message.immediateSource = node;
+		message.sequenceNumber = ++this.seqID;
+		
+		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
+		messageTimer.startRelative(1, node);
+		controlColor();
+		
+	}
 }
