@@ -31,6 +31,8 @@ import sinalgo.tools.storage.ReusableListIterator;
 
 public class BaseStation extends Node {
 	
+	public static boolean isFingerTableCreated;
+
 	private Integer sequenceID = 0;
 
 	private Boolean isRouteBuild = Boolean.FALSE;
@@ -76,7 +78,7 @@ public class BaseStation extends Node {
 						}
 					}
 					
-					if (payloadMessage.value.equals(ChordMessageType.SUPERVISOR_DOWN.getValue())){
+					if (payloadMessage.value.equals(ChordMessageType.MONITOR_DOWN.getValue())){
 						monitorNodes = UtilsChord.getAliveMonitorNodes();
 						
 						UtilsChord.createFingerTables(monitorNodes);
@@ -123,6 +125,7 @@ public class BaseStation extends Node {
 	@Override
 	public void neighborhoodChange() {
 		sendMessageTo();
+//		sendMessageFuzzyTo();
 	}
 
 	@Override
