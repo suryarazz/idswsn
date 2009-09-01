@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
@@ -48,8 +49,31 @@ public abstract class BasicNode extends Node{
 	private Boolean isDead = Boolean.FALSE;
 	private Boolean useFuzzyRouting = Boolean.FALSE;
 	
+	/**
+	 * If a node is neighbor of a monitor, it must store its reference in that list
+	 * because when the monitor is down, it will be able to advise the baseStation
+	 */
+	public Set<MonitorNode> monitors;
+	
+	
+	
+	/**
+	 * Stores the interval that the neighbors of a monitor will check whether it's alive
+	 */
+	public static final Integer DELAY_TIME;
+	public static final Integer MIN_DELAY_TIME = 100;
+	public static final Integer MAX_DELAY_TIME = 200;
+	
+	static{
+		Random random = Tools.getRandomNumberGenerator();
+		int nextInt = Math.abs(random.nextInt());
+		Integer interval = (nextInt % (MAX_DELAY_TIME.intValue() + 1));
 		
-	public Set<MonitorNode> supervisors;
+		int delay = interval + (interval.intValue() < MIN_DELAY_TIME ? MIN_DELAY_TIME : 0);
+		DELAY_TIME = delay;
+		
+	}
+
 	
 	@Override
 	public void checkRequirements() throws WrongConfigurationException {
@@ -88,7 +112,7 @@ public abstract class BasicNode extends Node{
 	@Override
 	public void init() {
 		this.setColor(getMyColor());
-		this.supervisors = new HashSet<MonitorNode>();
+		this.monitors = new HashSet<MonitorNode>();
 		try {
 			//Here, we have to get the routing protocol from Config.xml and inject into routing attribute
 			String routingProtocol = Configuration.getStringParameter("NetworkLayer/RoutingProtocolName");
@@ -223,17 +247,18 @@ public abstract class BasicNode extends Node{
 	protected void preProcessingMessage(Message message){}
 	
 	/**
-	 * This method is called after the message processing in the Inbox iterator
+	 * Every node that receive a chord message with the NOTIFY_NEIGHBORS value must add
+	 * the sender of this message as a monitor
 	 */
 	protected void postProcessingMessage(Message message){
 		if (message instanceof ChordMessage) {
 			ChordMessage chordMessage = (ChordMessage) message;
 			if(chordMessage.getChordMessageType().equals(ChordMessageType.NOTIFY_NEIGHBORS)){
-				this.supervisors.add((MonitorNode) chordMessage.getSender());
+				this.monitors.add((MonitorNode) chordMessage.getSender());
 				
-				if (supervisors.size() == 1) {
+				if (monitors.size() == 1) {//se houver pelo menos 1, é iniciado um timer recursivo para checar se o monitor está vivo
 					ChordDelayTimer chordDelayTimer = new ChordDelayTimer();
-					chordDelayTimer.startRelative(ChordDelayTimer.DELAY_TIME, this);
+					chordDelayTimer.startRelative(BasicNode.DELAY_TIME, this);
 				}
 			}
 		}
