@@ -1,5 +1,6 @@
 package projects.ids_wsn.nodes.messages;
 
+import projects.ids_wsn.enumerators.ChordMessageType;
 import projects.ids_wsn.nodeDefinitions.dht.Signature;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
@@ -8,7 +9,7 @@ import sinalgo.nodes.messages.Message;
  * A message used to transport data from a sender to a receiver
  */
 public class PayloadMsg extends Message {
-	
+
 	public Node baseStation; // BaseStation: node who should receive this msg
 	public Node nextHop;
 	public Node imediateSender;
@@ -80,6 +81,7 @@ public class PayloadMsg extends Message {
 		newMessage.value = this.value;
 		newMessage.ttl = this.ttl;
 		newMessage.immediateSource = this.immediateSource;
+		newMessage.setSignature(this.signature);
 		
 		return newMessage;
 	}
@@ -95,5 +97,9 @@ public class PayloadMsg extends Message {
 
 	public void setSignature(Signature signature) {
 		this.signature = signature;
+	}
+
+	public boolean isChordMessage() {
+		return this.value >= ChordMessageType.getMinValue() && this.value <= ChordMessageType.getMaxValue(); 
 	}
 }
