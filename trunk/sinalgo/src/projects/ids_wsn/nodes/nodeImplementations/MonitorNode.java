@@ -93,14 +93,21 @@ public class MonitorNode extends BasicNode implements IMonitor {
 
 	@Override
 	protected void preProcessingMessage(Message message) {
-
+		if (message instanceof PayloadMsg) {
+			PayloadMsg msg = (PayloadMsg) message;
+			if (!msg.isChordMessage()) {
+				addMessageToList(msg);
+			}
+		}
 	}
 
 	@Override
 	public Boolean beforeSendingMessage(Message message) {
 		if (message instanceof PayloadMsg) {
 			PayloadMsg msg = (PayloadMsg) message;
-			addMessageToList(msg);
+			if (!msg.isChordMessage()) {
+				addMessageToList(msg);
+			}
 		}
 		return Boolean.TRUE;
 	}
@@ -129,12 +136,15 @@ public class MonitorNode extends BasicNode implements IMonitor {
 		IMonitor rule3 = new IntervalRule(rule2);
 		rule3.doInference();
 
-		this.sendMaliciousNodesToSupervisor();
+		
+		if(BaseStation.isFingerTableCreated){
+			this.sendMaliciousNodesToSupervisor();
+		}
 	}
 
 	private void sendMaliciousNodesToSupervisor() {
+		
 		for (Rules rule : mapLocalMaliciousNodes.keySet()) {
-
 
 			Integer hashKey = UtilsChord.generateSHA1(rule.name());
 			MonitorNode sucessorNode = this.getDht().findSucessor(hashKey);
@@ -163,6 +173,7 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	
 	public void correlate(Set<Signature> signatures) {
 		// TODO Pegar método de correlacionar no projeto antigo do marvin
+		System.out.println("##########correlating...###########");
 	}
 	
 	public void addLocalMaliciousList(Rules rule, List<Node> lista) {
@@ -173,17 +184,21 @@ public class MonitorNode extends BasicNode implements IMonitor {
 	protected void postProcessingMessage(Message message) {
 		super.postProcessingMessage(message);
 		
+		//depois que os monitores receberem uma mensagem roteamento, eles estao certos de que podem enviar uma
+		//mensagem para a baseStation notificando-a de sua existência
 		if(message instanceof FloodFindDsdv || message instanceof FloodFindFuzzy){
 			this.sendMessageToBaseStation(ChordMessageType.ANSWER_MONITOR_ID.getValue());
 		}
 		
 		if (message instanceof PayloadMsg) {
 			PayloadMsg payloadMsg = (PayloadMsg) message;
-			if (payloadMsg.value == ChordMessageType.SEND_TO_SUPERVISOR.getValue()) {
+			
+			//recebendo assinaturas do outros monitores
+			if (payloadMsg.value == ChordMessageType.SEND_TO_SUPERVISOR.getValue().intValue()) {
 				
 				Signature signature = payloadMsg.getSignature();
-				
-				if (signature.getSupervisor().equals(this)) {//this node is a supervisor
+
+				if (signature.getSupervisor().equals(this)) {//this node is a supervisor (target) responsable for the signature rule
 					this.notifyNeighbors();// notify neighbors that this node is a supervisor
 					this.getDht().addExternalSignature(signature);
 				}
