@@ -260,6 +260,7 @@ public class DSDV implements IRouting {
 		message.baseStation = destino;
 		message.sender = node;
 		message.nextHop = nextHopToDestino;
+		message.imediateSender = node;
 		message.immediateSource = node;
 		message.sequenceNumber = ++this.seqID;
 		
