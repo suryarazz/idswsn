@@ -8,10 +8,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import projects.ids_wsn.nodeDefinitions.BasicNode;
+import projects.ids_wsn.nodes.nodeImplementations.BaseStation;
 import projects.ids_wsn.nodes.nodeImplementations.MonitorNode;
+import projects.ids_wsn.nodes.timers.ChordDelayTimer;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.TimerCollection;
+import sinalgo.nodes.timers.Timer;
 import sinalgo.runtime.nodeCollection.NodeCollectionInterface;
 import sinalgo.tools.Tools;
 
@@ -138,7 +142,7 @@ public class UtilsChord {
 	}
 	
 	public static void createFingerTables(List<MonitorNode> monitorNodes){
-		
+		BaseStation.isFingerTableCreated = true;
 		if(hasNodeWithTheSameHashID(monitorNodes)){
 			throw new RuntimeException("There are two monitor nodes with the same HASH ID." +
 						"\ntry to increase the Chord/Ring/Size in the config.xml file.");
@@ -170,13 +174,31 @@ public class UtilsChord {
 		return false;
 	}
 
-	public static void resetSupervisorsLists() {
+	public static void removeMonitorFromLists(MonitorNode monitor) {
 		NodeCollectionInterface nodes = Tools.getNodeList();
 		for (Node node : nodes) {
 			if (node instanceof BasicNode) {
 				BasicNode basicNode = (BasicNode) node;
-					basicNode.supervisors.clear();
+					basicNode.monitors.remove(monitor);
 			}
 		}
 	}
+
+	public static void removeTimers() {
+		NodeCollectionInterface nodes = Tools.getNodeList();
+		for (Node node : nodes) {
+			if (node instanceof BasicNode) {
+				BasicNode basicNode = (BasicNode) node;
+				
+				TimerCollection timers = basicNode.getTimers();
+				for (Timer timer : timers) {
+					if (timer instanceof ChordDelayTimer && basicNode.monitors.size() == 0) {
+						timers.remove(timer);
+					}
+				}
+			}
+		}
+		
+	}
+
 }
