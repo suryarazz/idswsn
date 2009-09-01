@@ -6,10 +6,16 @@ import projects.ids_wsn.nodeDefinitions.chord.UtilsChord;
 import projects.ids_wsn.nodes.nodeImplementations.MonitorNode;
 import sinalgo.nodes.timers.Timer;
 
+/**
+ * A message sent to baseStation to advise there is a supervisor dead or out of the network
+ * @author Alex Lacerda Ramos
+ *
+ */
 public class ChordDelayTimer extends Timer{
 
-	public static final Integer DELAY_TIME = 100;
-	
+	/**
+	 * check whether there is any monitor down in the monitor list of a neighbor  
+	 */
 	@Override
 	public void fire() {
 		if (!(node instanceof BasicNode)) {
@@ -18,14 +24,14 @@ public class ChordDelayTimer extends Timer{
 	
 		BasicNode basicNode = (BasicNode) node;
 		
-		for (MonitorNode monitor : basicNode.supervisors) {
+		for (MonitorNode monitor : basicNode.monitors) {
 			if (monitor.getIsDead()) {
-				basicNode.sendMessageToBaseStation(ChordMessageType.SUPERVISOR_DOWN.getValue());
-				UtilsChord.resetSupervisorsLists();
+				basicNode.sendMessageToBaseStation(ChordMessageType.MONITOR_DOWN.getValue());
+				UtilsChord.removeMonitorFromLists(monitor);//reseta a lista de monitores de todos os nós
+				UtilsChord.removeTimers();//remove os timers dos nós que deixarem de ser vizinhos de monitores
 			}
 		}
 		
-		this.startRelative(DELAY_TIME, basicNode);
+		this.startRelative(BasicNode.DELAY_TIME, basicNode);//recursive repetition on every time interval
 	}
-
 }
