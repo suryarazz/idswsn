@@ -253,10 +253,11 @@ public abstract class BasicNode extends Node{
 	protected void postProcessingMessage(Message message){
 		if (message instanceof ChordMessage) {
 			ChordMessage chordMessage = (ChordMessage) message;
+
 			if(chordMessage.getChordMessageType().equals(ChordMessageType.NOTIFY_NEIGHBORS)){
 				this.monitors.add((MonitorNode) chordMessage.getSender());
 				
-				if (monitors.size() == 1) {//se houver pelo menos 1, é iniciado um timer recursivo para checar se o monitor está vivo
+				if (monitors.size() == 1) {//se este nó for vizinho de pelo menos um monitor, é iniciado um timer (recursivo) para checar se o monitor está vivo
 					ChordDelayTimer chordDelayTimer = new ChordDelayTimer();
 					chordDelayTimer.startRelative(BasicNode.DELAY_TIME, this);
 				}
