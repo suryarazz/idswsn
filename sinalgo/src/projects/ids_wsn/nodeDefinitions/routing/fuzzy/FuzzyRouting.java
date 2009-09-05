@@ -609,4 +609,35 @@ public class FuzzyRouting implements IRouting {
 		controlColor();
 	}
 
+	@Override
+	public void sendChordMessage(PayloadMsg message) {
+		
+		if (node.getIsDead()){
+			return;
+		}
+		
+		Node nextHopToDestino;
+
+		node.seqID++;
+		//
+		Node destino = getSinkNode();
+		
+		if (!isMultiPathBalanced){
+			nextHopToDestino = getBestRoute(destino);
+		}else{
+			nextHopToDestino = getNextRouteBalanced(destino); 			
+		}
+		
+		message.baseStation = destino;
+		message.sender = node;
+		message.nextHop = nextHopToDestino;
+		message.imediateSender = node;
+		message.immediateSource = node;
+		message.sequenceNumber = ++this.seqID;
+		
+		SimpleMessageTimer messageTimer = new SimpleMessageTimer(message);
+		messageTimer.startRelative(1, node);
+		controlColor();
+		
+	}
 }
