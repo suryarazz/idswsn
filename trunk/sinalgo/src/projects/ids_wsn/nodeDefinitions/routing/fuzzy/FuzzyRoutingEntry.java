@@ -58,6 +58,10 @@ public class FuzzyRoutingEntry {
 		return node;
 	}
 	
+	public boolean removeEntry(RoutingField rf){
+		return fields.remove(rf);
+	}
+	
 	public Integer getFieldsSize(){
 		return fields.size();
 	}
