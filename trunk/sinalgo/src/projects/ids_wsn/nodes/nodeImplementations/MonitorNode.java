@@ -198,7 +198,7 @@ public class MonitorNode extends BasicNode implements IMonitor {
 				
 				Signature signature = payloadMsg.getSignature();
 
-				if (signature.getSupervisor().equals(this)) {//this node is a supervisor (target) responsable for the signature rule
+				if (signature.getSupervisor().equals(this)) {//this node is a supervisor (target) responsible for the signature rule
 					this.notifyNeighbors();// notify neighbors that this node is a supervisor
 					this.getDht().addExternalSignature(signature);
 				}
