@@ -71,13 +71,16 @@ public class BaseStation extends Node {
 					(payloadMessage.nextHop.equals(this))){
 					countReceivedMessages++;
 					
+					//mensagens do tipo ANSWER_MONITOR_ID sao enviadas por monitores para notificar a baseStation sobre
+					//sua existencia. Entao a baseStation estará apta a criar o Chord Ring.
 					if (payloadMessage.value.equals(ChordMessageType.ANSWER_MONITOR_ID.getValue())){
-						Boolean addNewNode = this.addMonitorNode((MonitorNode) payloadMessage.sender);
-						if(addNewNode && this.monitorNodes.size() >= UtilsChord.getAliveMonitorNodes().size()){
+						Boolean adicionouNovoNoh = this.addMonitorNode((MonitorNode) payloadMessage.sender);
+						if(adicionouNovoNoh && this.monitorNodes.size() >= UtilsChord.getAliveMonitorNodes().size()){
 							UtilsChord.createFingerTables(monitorNodes);
 						}
 					}
 					
+					//se um monitor está fora da rede, a baseStation refaz o Chord Ring somente com os monitores vivos
 					if (payloadMessage.value.equals(ChordMessageType.MONITOR_DOWN.getValue())){
 						monitorNodes = UtilsChord.getAliveMonitorNodes();
 						
