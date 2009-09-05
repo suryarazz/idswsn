@@ -27,8 +27,9 @@ public class ChordDelayTimer extends Timer{
 		for (MonitorNode monitor : basicNode.monitors) {
 			if (monitor.getIsDead()) {
 				basicNode.sendMessageToBaseStation(ChordMessageType.MONITOR_DOWN.getValue());
-				UtilsChord.removeMonitorFromLists(monitor);//reseta a lista de monitores de todos os nós
-				UtilsChord.removeTimers();//remove os timers dos nós que deixarem de ser vizinhos de monitores
+				UtilsChord.removeMonitorFromLists(monitor);//remove os monitores deads das listas de seus vizinhos
+				UtilsChord.removeTimers();//no caso de nós que só tinham este monitor como vizinho, é preciso remover seus timer
+											// que checam se um monitor vizinho está dead
 			}
 		}
 		
