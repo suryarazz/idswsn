@@ -37,6 +37,7 @@ public class EnergyComparator implements Comparator<BasicNode> {
 	
 	private int compareAsc(BasicNode r1, BasicNode r2){
 		int resultado = 0;
+		/*		
 		if (r1.getBateria().getEnergy() < r2.getBateria().getEnergy()){
 			resultado = -1;
 		}else if( r1.getBateria().getEnergy() > r2.getBateria().getEnergy()){
@@ -45,6 +46,9 @@ public class EnergyComparator implements Comparator<BasicNode> {
 		}else{
 			resultado=0;
 		}
+		*/
+		
+		resultado = (r1.getBateria().getEnergy().compareTo(r2.getBateria().getEnergy()));
 		
 		return resultado;
 	}

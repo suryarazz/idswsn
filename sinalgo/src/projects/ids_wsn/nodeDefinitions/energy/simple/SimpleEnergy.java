@@ -27,7 +27,7 @@ public class SimpleEnergy implements IEnergy {
 		this.receive = Float.valueOf(0);
 		this.processing = Float.valueOf(0);
 		this.listen = Float.valueOf(0);
-		this.totalEnergy = 60000f;
+		this.totalEnergy = 80000f;
 	}
 	
 	public Float getTotalSpentEnergy(){
